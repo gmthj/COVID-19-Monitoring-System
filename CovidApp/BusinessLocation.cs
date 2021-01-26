@@ -55,7 +55,7 @@ namespace CovidApp
 
         public bool IsFull()
         {
-            if (VisitorsNow == MaximumCapacity) // "==" is used instead of ">=" as there should not be a case where VisitorsNow > MaximumCapacity if checks are done correctly in SafeEntry class
+            if (VisitorsNow == MaximumCapacity) // "==" is used instead of ">=" as there should not be a case where VisitorsNow > MaximumCapacity if checks are done correctly in Program.cs
             {
                 return true;
             }
@@ -65,7 +65,7 @@ namespace CovidApp
 
         public override string ToString()
         {
-            return "Business Name: " + BusinessName + "/t Branch Code: " + BranchCode + "/tMaximum Capacity: " + MaximumCapacity + "/tVisitors Now: " + VisitorsNow;
+            return "Business Name: " + BusinessName + "/tBranch Code: " + BranchCode + "/tMaximum Capacity: " + MaximumCapacity + "/tVisitors Now: " + VisitorsNow;
         }
     }
 }

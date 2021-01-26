@@ -47,7 +47,7 @@ namespace CovidApp
         public bool IsEligibleForReplacement()
         {
             bool eligibility = true;
-            DateTime today = DateTime.Today; // DateTime.Today is used instead of DateTime. Now as the precising of exact time inst needed as we are only comparing months/days
+            DateTime today = DateTime.Today; // DateTime.Today is used instead of DateTime.Now as the precising of exact time inst needed as we are only comparing months/days
             int dateDifferenceTimeSpan = ((today.Year - ExpiryDate.Year) * 12) + ((today.Month - ExpiryDate.Month) *30) + today.Day - ExpiryDate.Day;
             if (dateDifferenceTimeSpan < -30 || dateDifferenceTimeSpan > 0) //assuming there are 30 days in a month
             {
