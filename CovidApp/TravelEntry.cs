@@ -67,6 +67,7 @@ namespace CovidApp
             LastCountryOfEmbarkation = lastCountryOfEmbarkation;
             EntryMode = entryMode;
             EntryDate = entryDate;
+            ShnStay = null;
             IsPaid = false;
         }
 
