@@ -9,6 +9,12 @@
     <None Update="BusinessLocation.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="csv files\BusinessLocation.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="csv files\Person.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Person.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
