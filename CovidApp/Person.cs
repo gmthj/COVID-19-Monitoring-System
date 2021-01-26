@@ -42,9 +42,9 @@ namespace CovidApp
             TravelEntryList = new List<TravelEntry>();
         }
 
-        public Person(string n)
+        public Person(string name)
         {
-            Name = n;
+            Name = name;
             SafeEntryList = new List<SafeEntry>();
             TravelEntryList = new List<TravelEntry>();
         }
