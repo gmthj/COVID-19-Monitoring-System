@@ -14,6 +14,7 @@ namespace CovidApp
         {
             Console.WriteLine("Hello World!");
             //hello ooga booga test
+            //hello booya nikka wheres my mony
         }
     }
 }
