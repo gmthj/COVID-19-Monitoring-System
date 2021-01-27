@@ -48,5 +48,10 @@ namespace CovidApp
 
             return charges * 1.07;
         }
+
+        public override string ToString()
+        {
+            return "Passport No.: " + PassportNo + "\tNationality: " + Nationality;
+        }
     }
 }
