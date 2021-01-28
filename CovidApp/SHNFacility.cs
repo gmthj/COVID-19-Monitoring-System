@@ -124,7 +124,7 @@ namespace CovidApp
 
         public override string ToString()
         {
-            return "Facility Name: " + FacilityName + "/tFacility Capacity: " + FacilityCapacity + "/tFacility Vacancy: " + FacilityVacancy + "/tDistance From Air Checkpoint: " + DistFromAirCheckpoint + "/tDistance From Sea Checkpoint: " + DistFromSeaCheckpoint + "/tDistance From Land Checkpoint: " + DistFromLandCheckpoint;
+            return "Facility Name: " + FacilityName + "\tFacility Capacity: " + FacilityCapacity + "\tFacility Vacancy: " + FacilityVacancy + "\tDistance From Air Checkpoint: " + DistFromAirCheckpoint + "\tDistance From Sea Checkpoint: " + DistFromSeaCheckpoint + "\tDistance From Land Checkpoint: " + DistFromLandCheckpoint;
         }
     }
 }

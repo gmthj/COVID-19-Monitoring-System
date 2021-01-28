@@ -94,7 +94,7 @@ namespace CovidApp
 
         public override string ToString()
         {
-            return "Last Country Of Embarkation: " + LastCountryOfEmbarkation + "/tEntry Mode: " + EntryMode + "/tEntry Date: " + EntryDate + "/tShn End Date: " + ShnEndDate + "/tShn Stay: " + ShnStay + "/tIs Paid: " + IsPaid;
+            return "Last Country Of Embarkation: " + LastCountryOfEmbarkation + "\tEntry Mode: " + EntryMode + "\tEntry Date: " + EntryDate + "\tShn End Date: " + ShnEndDate + "\tShn Stay: " + ShnStay + "\tIs Paid: " + IsPaid;
         }
     }
 }
