@@ -69,6 +69,7 @@ namespace CovidApp
             EntryDate = entryDate;
             ShnStay = null;
             IsPaid = false;
+            CalculateSHNDuration();
         }
 
         public void AssignSHNFacility(SHNFacility shnStay)

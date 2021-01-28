@@ -65,7 +65,7 @@ namespace CovidApp
 
         public override string ToString()
         {
-            return "Business Name: " + BusinessName + "/tBranch Code: " + BranchCode + "/tMaximum Capacity: " + MaximumCapacity + "/tVisitors Now: " + VisitorsNow;
+            return "Business Name: " + BusinessName + "\tBranch Code: " + BranchCode + "\tMaximum Capacity: " + MaximumCapacity + "\tVisitors Now: " + VisitorsNow;
         }
     }
 }

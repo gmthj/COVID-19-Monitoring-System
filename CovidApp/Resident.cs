@@ -41,6 +41,28 @@ namespace CovidApp
             LastLeftCountry = lastLeftCountry;
         }
 
+        public override double CalculateSHNCharges()
+        {
+            //string lastCountryVisited = this.TravelEntryList[TravelEntryList.Count-1].LastCountryOfEmbarkation;
+            double subTotalCost = 200;
+            TravelEntry latestTravelEntry = this.TravelEntryList[TravelEntryList.Count - 1];
+            int duration = (latestTravelEntry.ShnEndDate - latestTravelEntry.EntryDate).Days;
+            if (duration == 7)
+            {
+                subTotalCost += 20;
+            }
+            else if (duration == 14)
+            {
+                subTotalCost += 20 + 1000;
+            }
+            double totalCost = subTotalCost * 1.07;
+            return totalCost;
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + "\tAddress: " + Address + "\tLast Left Country: " + LastLeftCountry;
+        }
 
     }
 }

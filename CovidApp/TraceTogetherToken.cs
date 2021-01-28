@@ -66,7 +66,7 @@ namespace CovidApp
 
         public override string ToString()
         {
-            return "SerialNo: " + SerialNo + "/tCollection Location:" + CollectionLocation + "/tExpiry Date: " + ExpiryDate;
+            return "SerialNo: " + SerialNo + "\tCollection Location:" + CollectionLocation + "\tExpiry Date: " + ExpiryDate;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace CovidApp
 
         public override string ToString()
         {
-            return "Check In: " + CheckIn + "/tCheck Out: " + CheckOut + "/tLocation: " + Location;
+            return "Check In: " + CheckIn + "\tCheck Out: " + CheckOut + "\tLocation: " + Location;
         }
     }
 }
