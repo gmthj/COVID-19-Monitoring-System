@@ -39,11 +39,11 @@ namespace CovidApp
 
             //CalculateSHNCharges() testing;
             //DateTime time = new DateTime(2021, 1, 29, 20, 40, 30);
-            //DateTime EntryDate = new DateTime(2021, 2, 1, 8, 40, 30);
-            //Person r1 = new Resident("Marc", "760 Waterfront Waves", time);
-            //TravelEntry te = new TravelEntry("Macao SAR", "Air", EntryDate);
-            //r1.AddTravelEntry(te);
-            //r1.CalculateSHNCharges();
+            DateTime EntryDate = new DateTime(2021, 2, 1, 8, 40, 30);
+            Person r1 = new Visitor("john", "wefwe", "vewdvw");
+            TravelEntry te = new TravelEntry("Macao kb kSAR", "Air", EntryDate);
+            r1.AddTravelEntry(te);
+            Console.WriteLine(r1.CalculateSHNCharges());
         }
 
         //1) Load Person Data

@@ -37,13 +37,14 @@ namespace CovidApp
         public override double CalculateSHNCharges()
         {
             double charges = 200;
-            if (base.TravelEntryList[-1].ShnStay == null)
+            TravelEntry lastTravelEntry = base.TravelEntryList[TravelEntryList.Count - 1];
+            if (lastTravelEntry.ShnStay == null)
             {
                 charges += 80;
             }
             else
             {
-                charges += 2000 + base.TravelEntryList[-1].ShnStay.CalculateTravelCost(base.TravelEntryList[-1].EntryMode, base.TravelEntryList[-1].EntryDate);
+                charges += 2000 + lastTravelEntry.ShnStay.CalculateTravelCost(lastTravelEntry.EntryMode, lastTravelEntry.EntryDate);
             }
 
             return charges * 1.07;
