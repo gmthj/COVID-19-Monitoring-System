@@ -24,18 +24,26 @@ namespace CovidApp
 
             //1) Load Person and Business Location Data
             LoadPersonData(personDataList);
-            
+
 
 
             //random testing
-            foreach (string[] arr in personDataList)
-            {
-                foreach (string data in arr)
-                {
-                    Console.Write(data + "\t");
-                }
-                Console.WriteLine("");
-            }
+            //foreach (string[] arr in personDataList)
+            //{
+            //    foreach (string data in arr)
+            //    {
+            //        Console.Write(data + "\t");
+            //    }
+            //    Console.WriteLine("");
+            //}
+
+            //CalculateSHNCharges() testing;
+            //DateTime time = new DateTime(2021, 1, 29, 20, 40, 30);
+            //DateTime EntryDate = new DateTime(2021, 2, 1, 8, 40, 30);
+            //Person r1 = new Resident("Marc", "760 Waterfront Waves", time);
+            //TravelEntry te = new TravelEntry("Macao SAR", "Air", EntryDate);
+            //r1.AddTravelEntry(te);
+            //r1.CalculateSHNCharges();
         }
 
         //1) Load Person Data
