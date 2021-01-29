@@ -255,35 +255,66 @@ namespace CovidApp
 
         static int ObtainMenuInput()
         {
-            Console.Write("Please enter your option: ");
-            int option = Convert.ToInt32(Console.ReadLine());
-            return option;
-        }
-        static void ObtainResidentsData(List<string> serialNoList, List<Resident> residentList)
-        {
-            using (StreamReader sr = new StreamReader("csv files/Person.csv"))
+            while (true)
             {
-                string line = sr.ReadLine();
-                while ((line = sr.ReadLine()) != null)
+                try
                 {
-                    string[] formattedLine = line.Split(",");
-                    if (formattedLine[0] == "resident")
+                    Console.Write("Please enter your option: ");
+                    int option = Convert.ToInt32(Console.ReadLine());
+                    if (option > 16 || option < 1)
                     {
-                        if (formattedLine[6]!="")
+                        Console.WriteLine("Error, invalid option. Option must be integer between 1 and 16");
+                        continue;
+                    }
+                    else
+                    {
+                        return option;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+                }
+            }
+
+        }
+        static void ObtainResidentsData(List<string> serialNoList, List<Resident> residentList, List<SHNFacility> facilityList)
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader("csv files/Person.csv"))
+                {
+                    string line = sr.ReadLine();
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] formattedLine = line.Split(",");
+                        if (formattedLine[0] == "resident")
                         {
                             Resident newResident = new Resident(formattedLine[1], formattedLine[2], Convert.ToDateTime(formattedLine[3]));
-                            TraceTogetherToken newToken = new TraceTogetherToken(formattedLine[6], formattedLine[7], Convert.ToDateTime(formattedLine[8]));
-                            newResident.Token = newToken;
-                            serialNoList.Add(newToken.SerialNo);
-                            residentList.Add(newResident);
-                        }
-                        else
-                        {
-                            Resident newResident = new Resident(formattedLine[1], formattedLine[2], Convert.ToDateTime(formattedLine[3]));
+                            if (formattedLine[6] != "")
+                            {
+                                TraceTogetherToken newToken = new TraceTogetherToken(formattedLine[6], formattedLine[7], Convert.ToDateTime(formattedLine[8]));
+                                newResident.Token = newToken;
+                                serialNoList.Add(newToken.SerialNo);
+                                residentList.Add(newResident);
+                            }
+                            if (formattedLine[9] != "")
+                            {
+                                newResident.AddTravelEntry(NewTravelEntry(formattedLine[9], formattedLine[10], Convert.ToDateTime(formattedLine[11]), Convert.ToDateTime(formattedLine[12]), Convert.ToBoolean(formattedLine[13]), formattedLine[14], facilityList);
+                            }
                             residentList.Add(newResident);
                         }
                     }
                 }
+           
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Unable to find File \"csv files/Person.csv\".");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error, data in csv file is not in the correct format.");
             }
         }
 
@@ -364,9 +395,9 @@ namespace CovidApp
                     TraceTogetherToken newToken = new TraceTogetherToken(serialNo, collectionLocation, expiryDate);
                     searchedResident.Token = newToken;
                     Console.WriteLine();
-                    Console.WriteLine("New TraceTogether Token has been assigned to resident with name {0}.", residentName);
+                    Console.WriteLine("Sucess, new TraceTogether Token has been assigned to resident with name {0}.", residentName);
                     Console.WriteLine();
-                    Console.WriteLine("Assigned TraceTogether Token has the following details.");
+                    Console.WriteLine("Newly Assigned TraceTogether Token has the following details.");
                     Console.WriteLine("Serial No: {0}", newToken.SerialNo);
                     Console.WriteLine("Collection Location: {0}", newToken.CollectionLocation);
                     Console.WriteLine("Expiry Date: {0}", newToken.ExpiryDate);
@@ -380,7 +411,7 @@ namespace CovidApp
                         string collectionLocation = ObtainCollectionLocation(searchedResident);
                         searchedResident.Token.ReplaceToken(serialNo, collectionLocation);
                         Console.WriteLine();
-                        Console.WriteLine("TraceTogether Token of resident with name {0} has been replaced.", residentName);
+                        Console.WriteLine("Success, TraceTogether Token of resident with name {0} has been replaced.", residentName);
                         Console.WriteLine();
                         Console.WriteLine("Replacement TraceTogether Token has the following details.");
                         Console.WriteLine("Serial No: {0}", searchedResident.Token.SerialNo);
@@ -391,27 +422,34 @@ namespace CovidApp
                     else
                     {
                         Console.WriteLine();
-                        Console.WriteLine("TraceTogether Token of resident with name {0} is not eligible for replacement.", residentName);
+                        Console.WriteLine("Error, TraceTogether Token of resident with name {0} is not eligible for replacement.", residentName);
                     }
                 }
             }
             else
             {
                 Console.WriteLine();
-                Console.WriteLine("Resident with name {0} does not exist.", residentName);
+                Console.WriteLine("Error, resident with name {0} does not exist.", residentName);
             }
         }
         static void ObtainBusinessesData(List<BusinessLocation> businessList)
         {
-            using (StreamReader sr = new StreamReader("csv files/BusinessLocation.csv"))
+            try
             {
-                string line = sr.ReadLine();
-                while ((line = sr.ReadLine()) != null)
+                using (StreamReader sr = new StreamReader("csv files/BusinessLocation.csv"))
                 {
-                    string[] formattedLine = line.Split(",");
-                    BusinessLocation newBusiness = new BusinessLocation(formattedLine[0], formattedLine[1], Convert.ToInt32(formattedLine[2]));
-                    businessList.Add(newBusiness);
+                    string line = sr.ReadLine();
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] formattedLine = line.Split(",");
+                        BusinessLocation newBusiness = new BusinessLocation(formattedLine[0], formattedLine[1], Convert.ToInt32(formattedLine[2]));
+                        businessList.Add(newBusiness);
+                    }
                 }
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Unable to find File \"csv files/BusinessLocation.csv\".");
             }
         }
         static void DisplayBusinessList(List<BusinessLocation> businessList)
@@ -446,10 +484,17 @@ namespace CovidApp
         }
         static void EditLocationCapacity(List<BusinessLocation> businessList)
         {
-            BusinessLocation searchedLocation = SearchBusinessLocation(businessList);
-            Console.Write("Please enter new maximum capacity of business location: ");
-            int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
-            searchedLocation.MaximumCapacity = newMaxCapacity;
+            try
+            {
+                BusinessLocation searchedLocation = SearchBusinessLocation(businessList);
+                Console.Write("Please enter new maximum capacity of business location: ");
+                int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
+                searchedLocation.MaximumCapacity = newMaxCapacity;
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+            }
         }
 
 
