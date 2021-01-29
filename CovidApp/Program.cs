@@ -97,7 +97,7 @@ namespace CovidApp
 
                 else if (selectedOption == 11) //Create Visitor
                 {
-
+                    AddNewVisitor(personList);
                 }
 
                 else if (selectedOption == 12) //Create TravelEntry Record
@@ -346,6 +346,40 @@ namespace CovidApp
                 shnFacilityCount++;
             }
         }
+
+        static void AddNewVisitor(List<Person> personList)
+        {
+            List<string> existingNameList = new List<string>();
+            foreach (Person p in personList)
+            {
+                existingNameList.Add(p.Name);
+            }
+
+            Console.Write("Enter visitor name: ");
+            string newName = Console.ReadLine();
+            while (existingNameList.Contains(newName) && newName != "-1")
+            {
+                Console.WriteLine("Error: {0} already exists. Please use a different name.", newName);
+                Console.Write("Enter visitor name: ");
+                newName = Console.ReadLine();
+            }
+            if (newName != "-1")
+            {
+                Console.Write("Enter visitor passport number: ");
+                string newPassportNo = Console.ReadLine();
+                Console.Write("Enter visitor nationality: ");
+                string newNationality = Console.ReadLine();
+
+                personList.Add(new Visitor(newName, newPassportNo, newNationality));
+                Console.WriteLine("New Visitor {0}, Passport No. {1}, Nationality {2}, added successfully.", newName, newPassportNo, newNationality);
+            }
+            else
+            {
+                Console.WriteLine("Cancelled Adding New Visitor.");
+            }
+        }
+
+
 
 
 
