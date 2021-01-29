@@ -197,7 +197,10 @@ namespace CovidApp
         {
             TravelEntry te = new TravelEntry(travelEntryLastCountry, travelEntryMode, travelEntryDate);
             te.IsPaid = travelIsPaid;
-            te.AssignSHNFacility(SearchSHNFacility(facilityName, facilityList));
+            if (facilityName != "" && facilityName != null)
+            {
+                te.AssignSHNFacility(SearchSHNFacility(facilityName, facilityList));
+            }
             if (travelShnEndDate == null)
             {
                 te.CalculateSHNDuration();
@@ -215,7 +218,7 @@ namespace CovidApp
                     return sf;
                 }
             }
-            Console.WriteLine("\nERROR: facility name not found in SHN facility list\n"); //error message for testing.
+            Console.WriteLine("==\nERROR: facility name not found in SHN facility list\n=="); //error message for testing.
             return null;
         }
 
@@ -292,21 +295,31 @@ namespace CovidApp
                 int safeEntryCount = 1;
                 foreach (SafeEntry se in p.SafeEntryList)
                 {
-                    Console.WriteLine("Safe Entry Record Number [{0}]", safeEntryCount);
+                    // Student Number : S10203166
+                    // Student Name : Marc Lim Liang Kiat
+                    Console.WriteLine("\nSafe Entry Record Number [{0}]", safeEntryCount);
                     Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
                     Console.WriteLine("Check In Date And Time: {0}", se.CheckOut);
                     Console.WriteLine("Business Location: {0}", se.Location);
+                    //end marc
                 }
                 
                 int travelEntryCount = 1;
                 foreach (TravelEntry te in p.TravelEntryList)
                 {
-                    Console.WriteLine("\nPerson TravelEntry Number [" + travelEntryCount + "]");
+                    Console.WriteLine("\nTravelEntry Number [" + travelEntryCount + "]");
                     Console.WriteLine("Last Country Of Embarkation: " + te.LastCountryOfEmbarkation);
                     Console.WriteLine("Entry Mode: " + te.EntryMode);
                     Console.WriteLine("Entry Date: " + te.EntryDate);
                     Console.WriteLine("Shn End Date: " + te.ShnEndDate);
-                    Console.WriteLine("SHN Facility Name: " + te.ShnStay.FacilityName);
+                    if (te.ShnStay == null)
+                    {
+                        Console.WriteLine("SHN Facility Name: None");
+                    }
+                    else
+                    {
+                        Console.WriteLine("SHN Facility Name: " + te.ShnStay.FacilityName);
+                    }
                     Console.WriteLine("Is Paid: " + te.IsPaid);
                 }
             }
