@@ -17,13 +17,9 @@ namespace CovidApp
             //Initialisation
             List<string[]> personDataList = new List<string[]>();
             List<Person> personList = new List<Person>();
-            List<BusinessLocation> businessList = new List<BusinessLocation>();
             List<string> serialNoList = new List<string>();
             List<Resident> residentList = ObtainResidentsData(serialNoList);
-            Resident testResident = new Resident("Marc", "123 East Road", new DateTime(2020, 12, 20));
-            TraceTogetherToken testToken = new TraceTogetherToken("T23451", "test", new DateTime(2021, 2, 20));
-            testResident.Token = testToken;
-            residentList.Add(testResident);
+            List<BusinessLocation> businessList = ObtainBusinessesData();
             while (true)
             {
                 DisplayMenu();
@@ -38,64 +34,66 @@ namespace CovidApp
 
                 }
 
-                else if(selectedOption == 3)
+                else if (selectedOption == 3)
                 {
                     UpdateToken(residentList, serialNoList);
                     Console.WriteLine();
                     continue;
                 }
 
-                else if(selectedOption == 4)
+                else if (selectedOption == 4)
+                {
+                    DisplayBusinessList(businessList);
+                    continue;
+                }
+
+                else if (selectedOption == 5)
+                {
+                    EditLocationCapacity(businessList);
+                    continue;
+                }
+
+                else if (selectedOption == 6)
                 {
 
                 }
 
-                else if(selectedOption == 5)
+                else if (selectedOption == 7)
                 {
 
                 }
 
-                else if(selectedOption == 6)
+                else if (selectedOption == 8)
                 {
 
                 }
 
-                else if(selectedOption == 7)
+                else if (selectedOption == 9)
                 {
 
                 }
 
-                else if(selectedOption == 8)
+                else if (selectedOption == 10)
                 {
 
                 }
 
-                else if(selectedOption == 9)
+                else if (selectedOption == 11)
                 {
 
                 }
 
-                else if(selectedOption == 10)
+                else if (selectedOption == 12)
                 {
 
                 }
 
-                else if(selectedOption == 11)
+                else if (selectedOption == 13)
                 {
 
                 }
 
-                else if(selectedOption == 12)
-                {
-
-                }
-
-                else if(selectedOption == 13)
-                {
-
-                }
-
-                else if(selectedOption == 14)
+                else if (selectedOption == 14)
                 {
                     break;
                 }
@@ -136,6 +134,12 @@ namespace CovidApp
             //{
             //    Console.WriteLine(r);
             //}
+
+            //UpdateToken() testing
+            //Resident testResident = new Resident("Marc", "123 East Road", new DateTime(2020, 12, 20));
+            //TraceTogetherToken testToken = new TraceTogetherToken("T23451", "test", new DateTime(2021, 2, 20));
+            //testResident.Token = testToken;
+            //residentList.Add(testResident);
         }
 
         //1) Load Person Data
@@ -319,6 +323,58 @@ namespace CovidApp
                 Console.WriteLine();
                 Console.WriteLine("Resident with name {0} does not exist.", residentName);
             }
+        }
+        static List<BusinessLocation> ObtainBusinessesData()
+        {
+            List<BusinessLocation> businessList = new List<BusinessLocation>();
+            using (StreamReader sr = new StreamReader("csv files/BusinessLocation.csv"))
+            {
+                string line = sr.ReadLine();
+                while ((line = sr.ReadLine()) != null)
+                {
+                    string[] formattedLine = line.Split(",");
+                    BusinessLocation newBusiness = new BusinessLocation(formattedLine[0], formattedLine[1], Convert.ToInt32(formattedLine[2]));
+                    businessList.Add(newBusiness);
+                }
+            }
+            return businessList;
+        }
+        static void DisplayBusinessList(List<BusinessLocation> businessList)
+        {
+            int businessCount = 1;
+            Console.WriteLine();
+            foreach(BusinessLocation b in businessList)
+            {
+                Console.WriteLine("Business Location {0}", Convert.ToString(businessCount));
+                Console.WriteLine("Business Name: {0}",b.BusinessName);
+                Console.WriteLine("Branch Code: {0}",b.BranchCode);
+                Console.WriteLine("Maximum Capacity: {0}",b.MaximumCapacity);
+                Console.WriteLine("Visitors Now: {0}",b.VisitorsNow);
+                Console.WriteLine();
+                businessCount += 1;
+            }
+        }
+        static BusinessLocation SearchBusinessLocation(List<BusinessLocation> businessList)
+        {
+            Console.Write("Pleae enter the name of the business: ");
+            string businessName = Console.ReadLine();
+            Console.Write("Please enter the branch code of business location: ");
+            string branchCode = Console.ReadLine();
+            foreach(BusinessLocation b in businessList)
+            {
+                if (b.BusinessName == businessName && b.BranchCode == branchCode)
+                {
+                    return b;
+                }
+            }
+            return null;
+        }
+        static void EditLocationCapacity(List<BusinessLocation> businessList)
+        {
+            BusinessLocation searchedLocation = SearchBusinessLocation(businessList);
+            Console.Write("Please enter new maximum capacity of business location: ");
+            int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
+            searchedLocation.MaximumCapacity = newMaxCapacity;
         }
     }
 }
