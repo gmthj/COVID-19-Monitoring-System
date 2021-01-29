@@ -20,15 +20,11 @@ namespace CovidApp
             List<Resident> residentList = new List<Resident>();
             List<BusinessLocation> businessList = new List<BusinessLocation>();
 
-            Resident testResident = new Resident("Marc", "123 East Road", new DateTime(2020, 12, 20));
-            TraceTogetherToken testToken = new TraceTogetherToken("T23451", "test", new DateTime(2021, 2, 20));
-            testResident.Token = testToken;
-            residentList.Add(testResident);
             while (true)
             {
                 DisplayMenu();
                 int selectedOption = ObtainMenuInput();
-                if (selectedOption == 1)
+                if (selectedOption == 1) //Load Person and Business Location Data
                 {
                     ObtainResidentsData(serialNoList, residentList);
                     //LoadVisitor()
@@ -37,76 +33,76 @@ namespace CovidApp
                     Console.WriteLine("Data has been loaded.");
                     Console.WriteLine();
                 }
-                else if (selectedOption == 2)
+                else if (selectedOption == 2) //Load SHN Facility Data
                 {
 
                 }
-                else if (selectedOption == 3)
+                else if (selectedOption == 3) //List All Visitors
                 {
 
                 }
-                else if (selectedOption == 4)
+                else if (selectedOption == 4) //List Person Details
                 {
 
                 }
 
-                else if (selectedOption == 5)
+                else if (selectedOption == 5) //Assign/Replace TraceTogether Token
                 {
                     UpdateToken(residentList, serialNoList);
                     Console.WriteLine();
                 }
 
-                else if (selectedOption == 6)
+                else if (selectedOption == 6) //List All Business Locations
                 {
                     DisplayBusinessList(businessList);
                 }
 
-                else if (selectedOption == 7)
+                else if (selectedOption == 7) //Edit Business Location Capacity
                 {
                     EditLocationCapacity(businessList);
                 }
 
-                else if (selectedOption == 8)
+                else if (selectedOption == 8) //SafeEntry Check-in
                 {
                     SafeEntryCheckIn(personList, businessList);
                 }
 
-                else if (selectedOption == 9)
+                else if (selectedOption == 9) //SafeEntry Check-out
                 {
                     SafeEntryCheckOut(personList);
                 }
 
-                else if (selectedOption == 10)
+                else if (selectedOption == 10) //List All SHN Facilities
                 {
 
                 }
 
-                else if (selectedOption == 11)
+                else if (selectedOption == 11) //Create Visitor
                 {
 
                 }
 
-                else if (selectedOption == 12)
+                else if (selectedOption == 12) //Create TravelEntry Record
                 {
 
                 }
 
-                else if (selectedOption == 13)
+                else if (selectedOption == 13) //Calculate SHN Charges
                 {
 
                 }
 
-                else if (selectedOption == 14)
+                else if (selectedOption == 14) //Contact Tracing Reporting
                 {
                     ContactTracingReport(personList);
                 }
 
-                else if (selectedOption == 15)
+                else if (selectedOption == 15) //SHN Status Reporting
                 {
 
                 }
 
-                else if (selectedOption == 16)
+                else if (selectedOption == 16) //Exit
                 {
                     break;
                 }
