@@ -92,7 +92,7 @@ namespace CovidApp
 
                 else if (selectedOption == 10) //List All SHN Facilities
                 {
-
+                    DisplaySHNFacilitiesDetails(facilityList);
                 }
 
                 else if (selectedOption == 11) //Create Visitor
@@ -122,6 +122,7 @@ namespace CovidApp
 
                 else if (selectedOption == 16) //Exit
                 {
+                    Console.WriteLine("Exit.");
                     break;
                 }
                 Console.WriteLine();
@@ -307,7 +308,7 @@ namespace CovidApp
                 int travelEntryCount = 1;
                 foreach (TravelEntry te in p.TravelEntryList)
                 {
-                    Console.WriteLine("\nTravelEntry Number [" + travelEntryCount + "]");
+                    Console.WriteLine("\nTravel Entry Record Number [" + travelEntryCount + "]");
                     Console.WriteLine("Last Country Of Embarkation: " + te.LastCountryOfEmbarkation);
                     Console.WriteLine("Entry Mode: " + te.EntryMode);
                     Console.WriteLine("Entry Date: " + te.EntryDate);
@@ -328,6 +329,23 @@ namespace CovidApp
                 Console.WriteLine("Could not find a person with that name. Please try again.");
             }
         }
+
+        static void DisplaySHNFacilitiesDetails(List<SHNFacility> facilityList)
+        {
+            int shnFacilityCount = 1;
+            foreach (SHNFacility sf in facilityList)
+            {
+                Console.WriteLine("\nSHN Facility Number [{0}]", shnFacilityCount);
+                Console.WriteLine("Facility Name: " + sf.FacilityName);
+                Console.WriteLine("Facility Capacity: " + sf.FacilityCapacity);
+                Console.WriteLine("Facility Vacancy: " + sf.FacilityVacancy);
+                Console.WriteLine("Distance From Air Checkpoint: " + sf.DistFromAirCheckpoint);
+                Console.WriteLine("Distance From Sea Checkpoint: " + sf.DistFromSeaCheckpoint);
+                Console.WriteLine("Distance From Land Checkpoint: " + sf.DistFromLandCheckpoint);
+            }
+        }
+
+
 
         // End of methods coded by:
         // Student Number : S10203190
