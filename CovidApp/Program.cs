@@ -20,16 +20,18 @@ namespace CovidApp
             List<string> serialNoList = new List<string>();
             List<Resident> residentList = new List<Resident>();
             List<BusinessLocation> businessList = new List<BusinessLocation>();
-            ObtainResidentsData(serialNoList, residentList);
-            ObtainBusinessesData(businessList);
-            InitializePersonList(personList, residentList, null);
             while (true)
             {
                 DisplayMenu();
                 int selectedOption = ObtainMenuInput();
                 if (selectedOption == 1)
                 {
-
+                    ObtainResidentsData(serialNoList, residentList);
+                    //LoadVisitor()
+                    ObtainBusinessesData(businessList);
+                    InitializePersonList(personList, residentList, null);
+                    Console.WriteLine("Data has been loaded.");
+                    Console.WriteLine();
                 }
                 else if (selectedOption == 2)
                 {
@@ -65,12 +67,14 @@ namespace CovidApp
 
                 else if (selectedOption == 8)
                 {
-
+                    SafeEntryCheckIn(personList, businessList);
+                    continue;
                 }
 
                 else if (selectedOption == 9)
                 {
-
+                    SafeEntryCheckOut(personList);
+                    continue;
                 }
 
                 else if (selectedOption == 10)
@@ -192,8 +196,8 @@ namespace CovidApp
             Console.WriteLine("[7]  Edit Business Location Capacity");
             Console.WriteLine("[8]  SafeEntry Check-in");
             Console.WriteLine("[9]  SafeEntry Check-out");
-            Console.WriteLine("[10]  List All SHN Facilities");
-            Console.WriteLine("[11]  Create Visitor");
+            Console.WriteLine("[10] List All SHN Facilities");
+            Console.WriteLine("[11] Create Visitor");
             Console.WriteLine("[12] Create TravelEntry Record");
             Console.WriteLine("[13] Calculate SHN Charges");
             Console.WriteLine("[14] Contact Tracing Reporting");
@@ -298,7 +302,7 @@ namespace CovidApp
                     TraceTogetherToken newToken = new TraceTogetherToken(serialNo, collectionLocation, expiryDate);
                     searchedResident.Token = newToken;
                     Console.WriteLine();
-                    Console.WriteLine("TraceTogether Token has been assigned to resident with name {0}.", residentName);
+                    Console.WriteLine("New TraceTogether Token has been assigned to resident with name {0}.", residentName);
                     Console.WriteLine();
                     Console.WriteLine("Assigned TraceTogether Token has the following details.");
                     Console.WriteLine("Serial No: {0}", newToken.SerialNo);
@@ -355,7 +359,7 @@ namespace CovidApp
             Console.WriteLine();
             foreach(BusinessLocation b in businessList)
             {
-                Console.WriteLine("Business Location [{0}]", Convert.ToString(businessCount));
+                Console.WriteLine("Business Location Number [{0}]", Convert.ToString(businessCount));
                 Console.WriteLine("Business Name: {0}",b.BusinessName);
                 Console.WriteLine("Branch Code: {0}",b.BranchCode);
                 Console.WriteLine("Maximum Capacity: {0}",b.MaximumCapacity);
@@ -407,15 +411,54 @@ namespace CovidApp
             }
             return null;
         }
-        //static void SafeEntryCheckIn(List<Person> personList, List<BusinessLocation> businessList)
-        //{
-        //    Console.Write("Please enter the name of the person that is checking in: ");
-        //    string personName = Console.ReadLine();
-        //    Person searchedPerson = SearchPersonByName(personList, personName);
-        //    DisplayBusinessList(businessList);
-        //    Console.Write("Please enter the business location number (0, 1, 2, etc.) of the business location that is being checked in to: ");
-        //    int locationNumber = Convert.ToInt32(Console.ReadLine());
+        static void SafeEntryCheckIn(List<Person> personList, List<BusinessLocation> businessList)
+        {
+            Console.Write("Please enter the name of the person that is checking in: ");
+            string personName = Console.ReadLine();
+            Person searchedPerson = SearchPersonByName(personList, personName);
+            DisplayBusinessList(businessList);
+            Console.Write("Please enter the Business Location Number (1, 2, 3, etc.) of the business location that is being checked in to: ");
+            int locationNumber = Convert.ToInt32(Console.ReadLine());
+            BusinessLocation safeEntryLocation = businessList[locationNumber-1];
+            if (safeEntryLocation.IsFull())
+            {
+                Console.WriteLine("Unable to SafeEntry Check In as business location is at maximum capacity.");
+                Console.WriteLine();
+            }
+            else
+            {
+                SafeEntry newSafeEntry = new SafeEntry(DateTime.Now, safeEntryLocation);
+                safeEntryLocation.VisitorsNow += 1;
+                searchedPerson.AddSafeEntry(newSafeEntry);
+                Console.WriteLine("SafeEntry Entry Check In Successfull.");
+                Console.WriteLine();
+            }
 
-        //}
+        }
+        static void SafeEntryCheckOut(List<Person> personList)
+        {
+            int count = 1;
+            Console.Write("Please enter the name of the person that is checking out: ");
+            string personName = Console.ReadLine();
+            Person searchedPerson = SearchPersonByName(personList, personName);
+            foreach (SafeEntry se in searchedPerson.SafeEntryList)
+            {
+                Console.WriteLine("Safe Entry Record Number [{0}]",count);
+                Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
+                Console.WriteLine("Business Location: {0}", se.Location);
+                Console.WriteLine();
+                count += 1;
+            }
+            Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
+            int chosenRecord = Convert.ToInt32(Console.ReadLine());
+            SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord-1];
+            chosenSafeEntry.PerformCheckOut();
+            chosenSafeEntry.Location.VisitorsNow -= 1;
+            Console.WriteLine("Person with name {0} has been checked out of {1}.", personName, chosenSafeEntry.Location.BusinessName);
+            Console.WriteLine();
+
+        }
+
+        
     }
 }

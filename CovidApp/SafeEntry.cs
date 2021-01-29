@@ -41,13 +41,11 @@ namespace CovidApp
         {
             CheckIn = checkIn;
             Location = location;
-            Location.VisitorsNow += 1;
         }
 
         public void PerformCheckOut()
         {
             CheckOut = DateTime.Now;
-            Location.VisitorsNow -= 1;
         }
 
         public override string ToString()
