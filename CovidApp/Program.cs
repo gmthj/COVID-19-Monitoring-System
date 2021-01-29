@@ -17,8 +17,11 @@ namespace CovidApp
             //Initialisation
             List<string[]> personDataList = new List<string[]>();
             List<Person> personList = new List<Person>();
-
-
+            List<BusinessLocation> businessList = new List<BusinessLocation>();
+            while (true)
+            {
+                DisplayMenu();
+            }
 
             //BASIC FEATURES
 
@@ -71,7 +74,25 @@ namespace CovidApp
             }
         }
 
-        //1) Load Business Location Data
 
+        // Student Number : S10203166
+        // Student Name : Marc Lim Liang Kiat
+        static void DisplayMenu()
+        {
+            Console.WriteLine("******************Menu******************");
+            Console.WriteLine("[1]  List All Visitors");
+            Console.WriteLine("[2]  List Person Details");
+            Console.WriteLine("[3]  Assign/Replace TraceTogether Token");
+            Console.WriteLine("[4]  List All Business Locations");
+            Console.WriteLine("[5]  Edit Business Location Capacity");
+            Console.WriteLine("[6]  SafeEntry Check-in");
+            Console.WriteLine("[7]  SafeEntry Check-out");
+            Console.WriteLine("[8]  List All SHN Facilities");
+            Console.WriteLine("[9]  Create Visitor");
+            Console.WriteLine("[10] Create TravelEntry Record");
+            Console.WriteLine("[11] Calculate SHN Charges");
+            Console.WriteLine("[12] Contact Tracing Reporting");
+            Console.WriteLine("[13] SHN Status Reporting");
+        }
     }
 }
