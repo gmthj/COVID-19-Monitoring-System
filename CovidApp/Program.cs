@@ -487,10 +487,18 @@ namespace CovidApp
         {
             try
             {
+                DisplayBusinessList(businessList);
                 BusinessLocation searchedLocation = SearchBusinessLocation(businessList);
-                Console.Write("Please enter new maximum capacity of business location: ");
-                int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
-                searchedLocation.MaximumCapacity = newMaxCapacity;
+                if (searchedLocation != null)
+                {
+                    Console.Write("Please enter new maximum capacity of business location: ");
+                    int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
+                    searchedLocation.MaximumCapacity = newMaxCapacity;
+                }
+                else
+                {
+                    Console.WriteLine("Business Location not found");
+                }
             }
             catch (FormatException)
             {
