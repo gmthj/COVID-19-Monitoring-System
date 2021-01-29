@@ -18,15 +18,90 @@ namespace CovidApp
             List<string[]> personDataList = new List<string[]>();
             List<Person> personList = new List<Person>();
             List<BusinessLocation> businessList = new List<BusinessLocation>();
+            List<string> serialNoList = new List<string>();
+            List<Resident> residentList = ObtainResidentsData(serialNoList);
+            Resident testResident = new Resident("Marc", "123 East Road", new DateTime(2020, 12, 20));
+            TraceTogetherToken testToken = new TraceTogetherToken("T23451", "test", new DateTime(2021, 2, 20));
+            testResident.Token = testToken;
+            residentList.Add(testResident);
             while (true)
             {
                 DisplayMenu();
+                int selectedOption = ObtainMenuInput();
+                if (selectedOption == 1)
+                {
+
+                }
+
+                else if (selectedOption == 2)
+                {
+
+                }
+
+                else if(selectedOption == 3)
+                {
+                    UpdateToken(residentList, serialNoList);
+                    Console.WriteLine();
+                    continue;
+                }
+
+                else if(selectedOption == 4)
+                {
+
+                }
+
+                else if(selectedOption == 5)
+                {
+
+                }
+
+                else if(selectedOption == 6)
+                {
+
+                }
+
+                else if(selectedOption == 7)
+                {
+
+                }
+
+                else if(selectedOption == 8)
+                {
+
+                }
+
+                else if(selectedOption == 9)
+                {
+
+                }
+
+                else if(selectedOption == 10)
+                {
+
+                }
+
+                else if(selectedOption == 11)
+                {
+
+                }
+
+                else if(selectedOption == 12)
+                {
+
+                }
+
+                else if(selectedOption == 13)
+                {
+
+                }
+
+                else if(selectedOption == 14)
+                {
+                    break;
+                }
             }
 
-            //BASIC FEATURES
 
-            //1) Load Person and Business Location Data
-            LoadPersonData(personDataList);
 
 
 
@@ -55,6 +130,12 @@ namespace CovidApp
             //TravelEntry te = new TravelEntry("Macao kb kSAR", "Air", EntryDate);
             //r1.AddTravelEntry(te);
             //Console.WriteLine(r1.CalculateSHNCharges());
+
+            //ObtainResidentsData() testing
+            //foreach (Resident r in residentList)
+            //{
+            //    Console.WriteLine(r);
+            //}
         }
 
         //1) Load Person Data
@@ -82,7 +163,7 @@ namespace CovidApp
             }
         }
 
-
+        // Methods below were coded by:
         // Student Number : S10203166
         // Student Name : Marc Lim Liang Kiat
         static void DisplayMenu()
@@ -101,6 +182,143 @@ namespace CovidApp
             Console.WriteLine("[11] Calculate SHN Charges");
             Console.WriteLine("[12] Contact Tracing Reporting");
             Console.WriteLine("[13] SHN Status Reporting");
+            Console.WriteLine("[14] Exit");
+        }
+
+        static int ObtainMenuInput()
+        {
+            Console.Write("Please enter your option: ");
+            int option = Convert.ToInt32(Console.ReadLine());
+            return option;
+        }
+        static List<Resident> ObtainResidentsData(List<string> serialNoList)
+        {
+            List<Resident> residentList = new List<Resident>();
+            using (StreamReader sr = new StreamReader("csv files/Person.csv"))
+            {
+                string line = sr.ReadLine();
+                while ((line = sr.ReadLine()) != null)
+                {
+                    string[] formattedLine = line.Split(",");
+                    if (formattedLine[0] == "resident")
+                    {
+                        if (formattedLine[6]!="")
+                        {
+                            Resident newResident = new Resident(formattedLine[1], formattedLine[2], Convert.ToDateTime(formattedLine[3]));
+                            TraceTogetherToken newToken = new TraceTogetherToken(formattedLine[6], formattedLine[7], Convert.ToDateTime(formattedLine[8]));
+                            newResident.Token = newToken;
+                            serialNoList.Add(newToken.SerialNo);
+                            residentList.Add(newResident);
+                        }
+                        else
+                        {
+                            Resident newResident = new Resident(formattedLine[1], formattedLine[2], Convert.ToDateTime(formattedLine[3]));
+                            residentList.Add(newResident);
+                        }
+                    }
+                }
+            }
+            return residentList;
+        }
+        static Resident SearchResidentByName(List<Resident> residentList, string name)
+        {
+            foreach(Resident r in residentList)
+            {
+                if (name == r.Name)
+                {
+                    return r;
+                }
+            }
+            return null;
+        }
+
+        static string GenerateNewSerialNo(List<string> serialNoList)
+        {
+            string serialNo;
+            while (true)
+            {
+                Random rnd = new Random();
+                int min = 0;
+                int max = 99999;
+                int randomNumber = rnd.Next(min,max);
+                serialNo = "T" + randomNumber.ToString("D5");
+                if (serialNoList.Contains(serialNo))
+                {
+                    Console.WriteLine("Working");
+                    continue;
+                }
+                else
+                {
+                    serialNoList.Add(serialNo);
+                    break;
+                }
+            }
+            //foreach(string s in serialNoList)
+            //{
+            //    Console.WriteLine(s);
+            //}
+            //Console.WriteLine(serialNo);
+            return serialNo;
+        }
+        static string ObtainCollectionLocation(Resident r)
+        {
+            string address = r.Address;
+            string[] formattedAddress = address.Split(" ");
+            string collectionLocation = formattedAddress[1] + " " + formattedAddress[2] + " CC";
+            return collectionLocation;
+        }
+
+        static void UpdateToken(List<Resident> residentList, List<string> serialNoList)
+        {
+            Console.Write("Please enter name of resident: ");
+            string residentName = Console.ReadLine();
+            Resident searchedResident = SearchResidentByName(residentList, residentName);
+            if (searchedResident != null)
+            {
+                if (searchedResident.Token == null)
+                {
+                    string collectionLocation = ObtainCollectionLocation(searchedResident);
+                    string serialNo = GenerateNewSerialNo(serialNoList);
+                    DateTime expiryDate = DateTime.Today.AddMonths(6);
+                    TraceTogetherToken newToken = new TraceTogetherToken(serialNo, collectionLocation, expiryDate);
+                    searchedResident.Token = newToken;
+                    Console.WriteLine();
+                    Console.WriteLine("TraceTogether Token has been assigned to resident with name {0}.", residentName);
+                    Console.WriteLine();
+                    Console.WriteLine("Assigned TraceTogether Token has the following details.");
+                    Console.WriteLine("Serial No: {0}", newToken.SerialNo);
+                    Console.WriteLine("Collection Location: {0}", newToken.CollectionLocation);
+                    Console.WriteLine("Expiry Date: {0}", newToken.ExpiryDate);
+                }
+                else
+                {
+                    bool IsEligible = searchedResident.Token.IsEligibleForReplacement();
+                    if (IsEligible)
+                    {
+                        string serialNo = GenerateNewSerialNo(serialNoList);
+                        string collectionLocation = ObtainCollectionLocation(searchedResident);
+                        searchedResident.Token.ReplaceToken(serialNo, collectionLocation);
+                        Console.WriteLine();
+                        Console.WriteLine("TraceTogether Token of resident with name {0} has been replaced.", residentName);
+                        Console.WriteLine();
+                        Console.WriteLine("Replacement TraceTogether Token has the following details.");
+                        Console.WriteLine("Serial No: {0}", searchedResident.Token.SerialNo);
+                        Console.WriteLine("Collection Location: {0}", searchedResident.Token.CollectionLocation);
+                        Console.WriteLine("Expiry Date: {0}", searchedResident.Token.ExpiryDate);
+
+                    }
+                    else
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("TraceTogether Token of resident with name {0} is not eligible for replacement.", residentName);
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine();
+                Console.WriteLine("Resident with name {0} does not exist.", residentName);
+            }
         }
     }
 }
