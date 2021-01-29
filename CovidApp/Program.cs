@@ -4,9 +4,12 @@
 // Module Group : T07
 //============================================================
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace CovidApp
 {
@@ -26,7 +29,7 @@ namespace CovidApp
             ObtainVisitorData(visitorList, facilityList);
             ObtainBusinessesData(businessList);
             InitializePersonList(personList, residentList, visitorList);
-            //load shn falcity datta
+            ObtainSHNFacilityData(facilityList);
 
             while (true)
             {
@@ -48,19 +51,11 @@ namespace CovidApp
                 else if (selectedOption == 2) //Load SHN Facility Data
                 {
                     facilityList.Clear();
-
+                    ObtainSHNFacilityData(facilityList);
                 }
                 else if (selectedOption == 3) //List All Visitors
                 {
-                    foreach (Visitor v in visitorList)//just testing
-                    {
-                        Console.WriteLine(v.ToString());
-                        foreach (TravelEntry te in v.TravelEntryList)
-                        {
-                            Console.WriteLine(te.ToString());
-                        }
-                    }
-
+                    DisplayVisitorList(personList);
                 }
                 else if (selectedOption == 4) //List Person Details
                 {
@@ -70,7 +65,6 @@ namespace CovidApp
                 else if (selectedOption == 5) //Assign/Replace TraceTogether Token
                 {
                     UpdateToken(residentList, serialNoList);
-                    Console.WriteLine();
                 }
 
                 else if (selectedOption == 6) //List All Business Locations
@@ -129,9 +123,6 @@ namespace CovidApp
                 }
                 Console.WriteLine();
             }
-
-
-
 
 
             //TESTING
@@ -224,6 +215,47 @@ namespace CovidApp
             Console.WriteLine("\nERROR: facility name not found in SHN facility list\n"); //error message for testing.
             return null;
         }
+
+        static void ObtainSHNFacilityData(List<SHNFacility> facilityList)
+        {
+            List<SHNFacility> tempFacilityList = new List<SHNFacility>();
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://covidmonitoringapiprg2.azurewebsites.net");
+                Task<HttpResponseMessage> responseTask = client.GetAsync("/facility");
+                responseTask.Wait();
+                HttpResponseMessage result = responseTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    Task<string> readTask = result.Content.ReadAsStringAsync();
+                    readTask.Wait();
+                    string data = readTask.Result;
+                    tempFacilityList = JsonConvert.DeserializeObject<List<SHNFacility>>(data);
+                    foreach (SHNFacility sf in tempFacilityList) //bootleg solution but hey it works:)
+                    {
+                        facilityList.Add(sf);
+                    }
+                }
+            }
+        }
+
+        static void DisplayVisitorList(List<Person> personList)
+        {
+            int visitorCount = 1;
+            foreach (Person p in personList)
+            {
+                if (p is Visitor)
+                {
+                    Visitor v = (Visitor)p;
+                    Console.WriteLine("\nVisitor Number [" + visitorCount + "]");
+                    Console.WriteLine("Visitor Name: {0}", v.Name);
+                    Console.WriteLine("Visitor Passport Number: {0}", v.PassportNo);
+                    Console.WriteLine("Visitor Nationality: {0}", v.Nationality);
+                    visitorCount++;
+                }
+            }
+        }
+
         // End of methods coded by:
         // Student Number : S10203190
         // Student Name : Tan Hiang Joon Gabriel
