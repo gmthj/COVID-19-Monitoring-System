@@ -24,12 +24,12 @@ namespace CovidApp
             List<Visitor> visitorList = new List<Visitor>();
             List<BusinessLocation> businessList = new List<BusinessLocation>();
             List<SHNFacility> facilityList = new List<SHNFacility>();
-
+            
+            ObtainSHNFacilityData(facilityList);
             ObtainResidentsData(serialNoList, residentList);
             ObtainVisitorData(visitorList, facilityList);
             ObtainBusinessesData(businessList);
             InitializePersonList(personList, residentList, visitorList);
-            ObtainSHNFacilityData(facilityList);
 
             while (true)
             {
@@ -42,6 +42,8 @@ namespace CovidApp
                     visitorList.Clear();
                     personList.Clear();
                     businessList.Clear();
+                    facilityList.Clear();
+                    ObtainSHNFacilityData(facilityList); //this is here because to intialise personList, the TravelEntry requires there needs to be SHNFacilities to assign the person to as indicated in the person.csv file
                     ObtainResidentsData(serialNoList, residentList);
                     ObtainVisitorData(visitorList, facilityList);
                     ObtainBusinessesData(businessList);
@@ -52,6 +54,7 @@ namespace CovidApp
                 {
                     facilityList.Clear();
                     ObtainSHNFacilityData(facilityList);
+                    Console.WriteLine("Data has been loaded.");
                 }
                 else if (selectedOption == 3) //List All Visitors
                 {
@@ -59,7 +62,7 @@ namespace CovidApp
                 }
                 else if (selectedOption == 4) //List Person Details
                 {
-
+                    DisplayPersonDetails(personList);
                 }
 
                 else if (selectedOption == 5) //Assign/Replace TraceTogether Token
@@ -194,7 +197,7 @@ namespace CovidApp
         {
             TravelEntry te = new TravelEntry(travelEntryLastCountry, travelEntryMode, travelEntryDate);
             te.IsPaid = travelIsPaid;
-            //te.AssignSHNFacility(SearchSHNFacility(facilityName, facilityList)); loading of shn facilities to be completed first
+            te.AssignSHNFacility(SearchSHNFacility(facilityName, facilityList));
             if (travelShnEndDate == null)
             {
                 te.CalculateSHNDuration();
@@ -253,6 +256,60 @@ namespace CovidApp
                     Console.WriteLine("Visitor Nationality: {0}", v.Nationality);
                     visitorCount++;
                 }
+            }
+        }
+
+        static void DisplayPersonDetails(List<Person> personList)
+        {
+            Console.Write("Enter the Name of the Person: ");
+            string name = Console.ReadLine();
+            Person p = SearchPersonByName(personList, name);
+            if (p != null)
+            {
+                Console.WriteLine("\nPerson Name: {0}", p.Name);
+                if (p is Visitor)
+                {
+                    Visitor v = (Visitor)p;
+                    Console.WriteLine("Person Passport Number: {0}", v.PassportNo);
+                    Console.WriteLine("Person Nationality: {0}", v.Nationality);
+                }
+                else if (p is Resident)
+                {
+                    Resident r = (Resident)p;
+                    Console.WriteLine("Person Address: {0}", r.Address);
+                    Console.WriteLine("Person Last Left Country: {0}", r.LastLeftCountry);
+                    if (r.Token != null)
+                    {
+                        Console.WriteLine("Person TraceTogether Token Serial Number: {0}", r.Token.SerialNo);
+                        Console.WriteLine("Person TraceTogether Token Collection Location: {0}", r.Token.CollectionLocation);
+                        Console.WriteLine("Person TraceTogether Token Expiry Date: {0}", r.Token.ExpiryDate);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Person TraceTogether Token: {0}", "None");
+                    }
+                }
+
+                foreach (SafeEntry se in p.SafeEntryList)
+                {
+
+                }
+                
+                int travelEntryCount = 1;
+                foreach (TravelEntry te in p.TravelEntryList)
+                {
+                    Console.WriteLine("\nPerson TravelEntry Number [" + travelEntryCount + "]");
+                    Console.WriteLine("Last Country Of Embarkation: " + te.LastCountryOfEmbarkation);
+                    Console.WriteLine("Entry Mode: " + te.EntryMode);
+                    Console.WriteLine("Entry Date: " + te.EntryDate);
+                    Console.WriteLine("Shn End Date: " + te.ShnEndDate);
+                    Console.WriteLine("SHN Facility Name: " + te.ShnStay.FacilityName);
+                    Console.WriteLine("Is Paid: " + te.IsPaid);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Could not find a person with that name. Please try again.");
             }
         }
 
