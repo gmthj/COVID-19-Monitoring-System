@@ -44,7 +44,7 @@ namespace CovidApp
                     businessList.Clear();
                     facilityList.Clear();
                     ObtainSHNFacilityData(facilityList); //this is here because to intialise personList, the TravelEntry requires there needs to be SHNFacilities to assign the person to as indicated in the person.csv file
-                    ObtainResidentsData(serialNoList, residentList);
+                    ObtainResidentsData(serialNoList, residentList, facilityList);
                     ObtainVisitorData(visitorList, facilityList);
                     ObtainBusinessesData(businessList);
                     InitializePersonList(personList, residentList, visitorList);
@@ -67,7 +67,7 @@ namespace CovidApp
 
                 else if (selectedOption == 5) //Assign/Replace TraceTogether Token
                 {
-                    UpdateToken(residentList, serialNoList);
+                    UpdateToken(personList, serialNoList);
                 }
 
                 else if (selectedOption == 6) //List All Business Locations
@@ -344,35 +344,65 @@ namespace CovidApp
 
         static int ObtainMenuInput()
         {
-            Console.Write("Please enter your option: ");
-            int option = Convert.ToInt32(Console.ReadLine());
-            return option;
-        }
-        static void ObtainResidentsData(List<string> serialNoList, List<Resident> residentList)
-        {
-            using (StreamReader sr = new StreamReader("csv files/Person.csv"))
+            while (true)
             {
-                string line = sr.ReadLine();
-                while ((line = sr.ReadLine()) != null)
+                try
                 {
-                    string[] formattedLine = line.Split(",");
-                    if (formattedLine[0] == "resident")
+                    Console.Write("Please enter your option: ");
+                    int option = Convert.ToInt32(Console.ReadLine());
+                    if (option > 16 || option < 1)
                     {
-                        if (formattedLine[6]!="")
+                        Console.WriteLine("Error, invalid option. Option must be integer between 1 and 16");
+                        continue;
+                    }
+                    else
+                    {
+                        return option;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+                }
+            }
+
+        }
+        static void ObtainResidentsData(List<string> serialNoList, List<Resident> residentList, List<SHNFacility> facilityList)
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader("csv files/Person.csv"))
+                {
+                    string line = sr.ReadLine();
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] formattedLine = line.Split(",");
+                        if (formattedLine[0] == "resident")
                         {
                             Resident newResident = new Resident(formattedLine[1], formattedLine[2], Convert.ToDateTime(formattedLine[3]));
-                            TraceTogetherToken newToken = new TraceTogetherToken(formattedLine[6], formattedLine[7], Convert.ToDateTime(formattedLine[8]));
-                            newResident.Token = newToken;
-                            serialNoList.Add(newToken.SerialNo);
-                            residentList.Add(newResident);
-                        }
-                        else
-                        {
-                            Resident newResident = new Resident(formattedLine[1], formattedLine[2], Convert.ToDateTime(formattedLine[3]));
+                            if (formattedLine[6] != "")
+                            {
+                                TraceTogetherToken newToken = new TraceTogetherToken(formattedLine[6], formattedLine[7], Convert.ToDateTime(formattedLine[8]));
+                                newResident.Token = newToken;
+                                serialNoList.Add(newToken.SerialNo);
+                            }
+                            if (formattedLine[9] != "")
+                            {
+                                newResident.AddTravelEntry(NewTravelEntry(formattedLine[9], formattedLine[10], Convert.ToDateTime(formattedLine[11]), Convert.ToDateTime(formattedLine[12]), Convert.ToBoolean(formattedLine[13]), formattedLine[14], facilityList));
+                            }
                             residentList.Add(newResident);
                         }
                     }
                 }
+           
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Unable to find File \"csv files/Person.csv\".");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error, data in csv file is not in the correct format.");
             }
         }
 
@@ -391,13 +421,16 @@ namespace CovidApp
             //end gabriel
         }
 
-        static Resident SearchResidentByName(List<Resident> residentList, string name)
+        static Resident SearchResidentByName(List<Person> personList, string name)
         {
-            foreach(Resident r in residentList)
+            foreach(Person p in personList)
             {
-                if (name == r.Name)
+                if(p is Resident)
                 {
-                    return r;
+                    if (name == p.Name)
+                    {
+                        return (Resident)p;
+                    }
                 }
             }
             return null;
@@ -438,11 +471,11 @@ namespace CovidApp
             return collectionLocation;
         }
 
-        static void UpdateToken(List<Resident> residentList, List<string> serialNoList)
+        static void UpdateToken(List<Person> personList, List<string> serialNoList)
         {
             Console.Write("Please enter name of resident: ");
             string residentName = Console.ReadLine();
-            Resident searchedResident = SearchResidentByName(residentList, residentName);
+            Resident searchedResident = SearchResidentByName(personList, residentName);
             if (searchedResident != null)
             {
                 if (searchedResident.Token == null)
@@ -453,9 +486,9 @@ namespace CovidApp
                     TraceTogetherToken newToken = new TraceTogetherToken(serialNo, collectionLocation, expiryDate);
                     searchedResident.Token = newToken;
                     Console.WriteLine();
-                    Console.WriteLine("New TraceTogether Token has been assigned to resident with name {0}.", residentName);
+                    Console.WriteLine("Success, new TraceTogether Token has been assigned to resident with name {0}.", residentName);
                     Console.WriteLine();
-                    Console.WriteLine("Assigned TraceTogether Token has the following details.");
+                    Console.WriteLine("Newly Assigned TraceTogether Token has the following details.");
                     Console.WriteLine("Serial No: {0}", newToken.SerialNo);
                     Console.WriteLine("Collection Location: {0}", newToken.CollectionLocation);
                     Console.WriteLine("Expiry Date: {0}", newToken.ExpiryDate);
@@ -469,7 +502,7 @@ namespace CovidApp
                         string collectionLocation = ObtainCollectionLocation(searchedResident);
                         searchedResident.Token.ReplaceToken(serialNo, collectionLocation);
                         Console.WriteLine();
-                        Console.WriteLine("TraceTogether Token of resident with name {0} has been replaced.", residentName);
+                        Console.WriteLine("Success, TraceTogether Token of resident with name {0} has been replaced.", residentName);
                         Console.WriteLine();
                         Console.WriteLine("Replacement TraceTogether Token has the following details.");
                         Console.WriteLine("Serial No: {0}", searchedResident.Token.SerialNo);
@@ -480,27 +513,34 @@ namespace CovidApp
                     else
                     {
                         Console.WriteLine();
-                        Console.WriteLine("TraceTogether Token of resident with name {0} is not eligible for replacement.", residentName);
+                        Console.WriteLine("Error, TraceTogether Token of resident with name {0} is not eligible for replacement.", residentName);
                     }
                 }
             }
             else
             {
                 Console.WriteLine();
-                Console.WriteLine("Resident with name {0} does not exist.", residentName);
+                Console.WriteLine("Error, resident with name {0} does not exist, please try again.", residentName);
             }
         }
         static void ObtainBusinessesData(List<BusinessLocation> businessList)
         {
-            using (StreamReader sr = new StreamReader("csv files/BusinessLocation.csv"))
+            try
             {
-                string line = sr.ReadLine();
-                while ((line = sr.ReadLine()) != null)
+                using (StreamReader sr = new StreamReader("csv files/BusinessLocation.csv"))
                 {
-                    string[] formattedLine = line.Split(",");
-                    BusinessLocation newBusiness = new BusinessLocation(formattedLine[0], formattedLine[1], Convert.ToInt32(formattedLine[2]));
-                    businessList.Add(newBusiness);
+                    string line = sr.ReadLine();
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] formattedLine = line.Split(",");
+                        BusinessLocation newBusiness = new BusinessLocation(formattedLine[0], formattedLine[1], Convert.ToInt32(formattedLine[2]));
+                        businessList.Add(newBusiness);
+                    }
                 }
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Unable to find File \"csv files/BusinessLocation.csv\".");
             }
         }
         static void DisplayBusinessList(List<BusinessLocation> businessList)
@@ -535,10 +575,25 @@ namespace CovidApp
         }
         static void EditLocationCapacity(List<BusinessLocation> businessList)
         {
-            BusinessLocation searchedLocation = SearchBusinessLocation(businessList);
-            Console.Write("Please enter new maximum capacity of business location: ");
-            int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
-            searchedLocation.MaximumCapacity = newMaxCapacity;
+            try
+            {
+                DisplayBusinessList(businessList);
+                BusinessLocation searchedLocation = SearchBusinessLocation(businessList);
+                if (searchedLocation != null)
+                {
+                    Console.Write("Please enter new maximum capacity of business location: ");
+                    int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
+                    searchedLocation.MaximumCapacity = newMaxCapacity;
+                }
+                else
+                {
+                    Console.WriteLine("Business Location not found");
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+            }
         }
 
 
@@ -555,83 +610,139 @@ namespace CovidApp
         }
         static void SafeEntryCheckIn(List<Person> personList, List<BusinessLocation> businessList)
         {
-            Console.Write("Please enter the name of the person that is checking in: ");
-            string personName = Console.ReadLine();
-            Person searchedPerson = SearchPersonByName(personList, personName);
-            DisplayBusinessList(businessList);
-            Console.Write("Please enter the Business Location Number (1, 2, 3, etc.) of the business location that is being checked in to: ");
-            int locationNumber = Convert.ToInt32(Console.ReadLine());
-            BusinessLocation safeEntryLocation = businessList[locationNumber-1];
-            if (safeEntryLocation.IsFull())
+            try
             {
-                Console.WriteLine("Unable to SafeEntry Check In as business location is at maximum capacity.");
+                Console.Write("Please enter the name of the person that is checking in: ");
+                string personName = Console.ReadLine();
+                Person searchedPerson = SearchPersonByName(personList, personName);
+                if (searchedPerson != null)
+                {
+                    DisplayBusinessList(businessList);
+                    Console.Write("Please enter the Business Location Number (1, 2, 3, etc.) of the business location that is being checked in to: ");
+                    int locationNumber = Convert.ToInt32(Console.ReadLine());
+                    if (locationNumber > 0 && locationNumber <= businessList.Count)
+                    {
+                        BusinessLocation safeEntryLocation = businessList[locationNumber - 1];
+                        if (safeEntryLocation.IsFull())
+                        {
+                            Console.WriteLine("Unable to SafeEntry Check In as business location is at maximum capacity.");
+                        }
+                        else
+                        {
+                            SafeEntry newSafeEntry = new SafeEntry(DateTime.Now, safeEntryLocation);
+                            safeEntryLocation.VisitorsNow += 1;
+                            searchedPerson.AddSafeEntry(newSafeEntry);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error, invalid option. Option must be integer between 1 and {0}, please try again.", businessList.Count);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Error, person with name {0} does not exist, please try again.", personName);
+                }
             }
-            else
+            catch (FormatException)
             {
-                SafeEntry newSafeEntry = new SafeEntry(DateTime.Now, safeEntryLocation);
-                safeEntryLocation.VisitorsNow += 1;
-                searchedPerson.AddSafeEntry(newSafeEntry);
-                Console.WriteLine("SafeEntry Entry Check In Successfull.");
+                Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
             }
-
         }
         static void SafeEntryCheckOut(List<Person> personList)
         {
-            int count = 1;
-            Console.Write("Please enter the name of the person that is checking out: ");
-            string personName = Console.ReadLine();
-            Console.WriteLine();
-            Person searchedPerson = SearchPersonByName(personList, personName);
-            foreach (SafeEntry se in searchedPerson.SafeEntryList)
+            try
             {
-                Console.WriteLine("Safe Entry Record Number [{0}]",count);
-                Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
-                Console.WriteLine("Business Location: {0}", se.Location);
+                int count = 1;
+                Console.Write("Please enter the name of the person that is checking out: ");
+                string personName = Console.ReadLine();
                 Console.WriteLine();
-                count += 1;
+                Person searchedPerson = SearchPersonByName(personList, personName);
+                if (searchedPerson != null)
+                {
+                    foreach (SafeEntry se in searchedPerson.SafeEntryList)
+                    {
+                        if (se.CheckOut == DateTime.MinValue)
+                        {
+                            Console.WriteLine("Safe Entry Record Number [{0}]", count);
+                            Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
+                            Console.WriteLine("Business Location: {0}", se.Location);
+                            Console.WriteLine();
+                            count += 1;
+                        }
+                    }
+                    Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
+                    int chosenRecord = Convert.ToInt32(Console.ReadLine());
+                    if (chosenRecord >0 && chosenRecord <= searchedPerson.SafeEntryList.Count)
+                    {
+                        SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord - 1];
+                        chosenSafeEntry.PerformCheckOut();
+                        chosenSafeEntry.Location.VisitorsNow -= 1;
+                        Console.WriteLine("Person with name {0} has been checked out of {1}.", personName, chosenSafeEntry.Location.BusinessName);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error, invalid option. Option must be integer between 1 and {0}, please try again.", searchedPerson.SafeEntryList.Count);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Error, person with name {0} does not exist, please try again.", personName);
+                }
             }
-            Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
-            int chosenRecord = Convert.ToInt32(Console.ReadLine());
-            SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord-1];
-            chosenSafeEntry.PerformCheckOut();
-            chosenSafeEntry.Location.VisitorsNow -= 1;
-            Console.WriteLine("Person with name {0} has been checked out of {1}.", personName, chosenSafeEntry.Location.BusinessName);
-
+            catch (FormatException)
+            {
+                Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+            }
         }
         static void ContactTracingReport(List<Person> personList)
         {
-            Console.Write("Please enter a Starting Date/Time (DD/MM/YYYY hh:mm:ss): ");
-            DateTime startingCheckTime = Convert.ToDateTime(Console.ReadLine());
-            Console.Write("Please enter a Ending Date/Time (DD/MM/YYYY hh:mm:ss): ");
-            DateTime endingCheckTime = Convert.ToDateTime(Console.ReadLine());
-            Console.Write("Please enter a Business Name: ");
-            string businessName = Console.ReadLine();
-            List<Person> CheckedInList = new List<Person>();
-            //foreach(Person p in personList)
-            //{
-            //    foreach(SafeEntry se in p.SafeEntryList)
-            //    {
-            //        if (se.Location.BusinessName == businessName && se.CheckIn > startingCheckTime && se.CheckOut<endingCheckTime)
-            //        {
-            //            CheckedInList.Add(p);
-            //        }
-            //    }
-            //}
-            using (StreamWriter sw = new StreamWriter("Contact_Tracing_Report.csv", false))
+            try
             {
-                sw.WriteLine("Check In Date/Time, Check Out Date/Time, Location");
-                foreach (Person p in personList)
+                Console.Write("Please enter a Starting Date/Time (DD/MM/YYYY hh:mm:ss): ");
+                DateTime startingCheckTime = Convert.ToDateTime(Console.ReadLine());
+                Console.Write("Please enter a Ending Date/Time (DD/MM/YYYY hh:mm:ss): ");
+                DateTime endingCheckTime = Convert.ToDateTime(Console.ReadLine());
+                Console.Write("Please enter a Business Name: ");
+                string businessName = Console.ReadLine();
+                List<Person> CheckedInList = new List<Person>();
+                //foreach(Person p in personList)
+                //{
+                //    foreach(SafeEntry se in p.SafeEntryList)
+                //    {
+                //        if (se.Location.BusinessName == businessName && se.CheckIn > startingCheckTime && se.CheckOut<endingCheckTime)
+                //        {
+                //            CheckedInList.Add(p);
+                //        }
+                //    }
+                //}
+                using (StreamWriter sw = new StreamWriter("Contact_Tracing_Report.csv", false))
                 {
-                    foreach (SafeEntry se in p.SafeEntryList)
+                    bool exist = false;
+                    sw.WriteLine("Check In Date/Time, Check Out Date/Time, Location");
+                    foreach (Person p in personList)
                     {
-                        if (se.Location.BusinessName == businessName && se.CheckIn >= startingCheckTime && se.CheckOut <= endingCheckTime)
+                        foreach (SafeEntry se in p.SafeEntryList)
                         {
-                            CheckedInList.Add(p);
-                            string data = Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
-                            sw.WriteLine(data);
+                            if (se.Location.BusinessName == businessName && se.CheckIn >= startingCheckTime && se.CheckOut <= endingCheckTime)
+                            {
+                                CheckedInList.Add(p);
+                                string data = Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
+                                sw.WriteLine(data);
+                                exist = true;
+                            }
                         }
                     }
+                    if (exist == false)
+                    {
+                        Console.WriteLine("Business Location with name {0} not found", businessName);
+                    }
                 }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Input string is not in the correct date format, input string should be in format of (DD/MM/YYYY hh:mm:ss). Please try again.");
             }
         }
         // End of methods coded by:
