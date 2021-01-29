@@ -26,7 +26,7 @@ namespace CovidApp
             List<SHNFacility> facilityList = new List<SHNFacility>();
             
             ObtainSHNFacilityData(facilityList);
-            ObtainResidentsData(serialNoList, residentList);
+            ObtainResidentsData(serialNoList, residentList, facilityList);
             ObtainVisitorData(visitorList, facilityList);
             ObtainBusinessesData(businessList);
             InitializePersonList(personList, residentList, visitorList);
@@ -289,10 +289,13 @@ namespace CovidApp
                         Console.WriteLine("Person TraceTogether Token: {0}", "None");
                     }
                 }
-
+                int safeEntryCount = 1;
                 foreach (SafeEntry se in p.SafeEntryList)
                 {
-
+                    Console.WriteLine("Safe Entry Record Number [{0}]", safeEntryCount);
+                    Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
+                    Console.WriteLine("Check In Date And Time: {0}", se.CheckOut);
+                    Console.WriteLine("Business Location: {0}", se.Location);
                 }
                 
                 int travelEntryCount = 1;
