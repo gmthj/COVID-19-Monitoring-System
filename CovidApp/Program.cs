@@ -201,6 +201,7 @@ namespace CovidApp
             if (facilityName != "" && facilityName != null)
             {
                 te.AssignSHNFacility(SearchSHNFacility(facilityName, facilityList));
+                te.ShnStay.FacilityVacancy--;
             }
             if (travelShnEndDate == null)
             {
@@ -240,7 +241,7 @@ namespace CovidApp
                     tempFacilityList = JsonConvert.DeserializeObject<List<SHNFacility>>(data);
                     foreach (SHNFacility sf in tempFacilityList) //bootleg solution but hey it works:)
                     {
-                        facilityList.Add(sf);
+                        facilityList.Add(new SHNFacility(sf.FacilityName, sf.FacilityCapacity, sf.DistFromAirCheckpoint, sf.DistFromSeaCheckpoint, sf.DistFromLandCheckpoint));
                     }
                 }
             }
@@ -342,6 +343,7 @@ namespace CovidApp
                 Console.WriteLine("Distance From Air Checkpoint: " + sf.DistFromAirCheckpoint);
                 Console.WriteLine("Distance From Sea Checkpoint: " + sf.DistFromSeaCheckpoint);
                 Console.WriteLine("Distance From Land Checkpoint: " + sf.DistFromLandCheckpoint);
+                shnFacilityCount++;
             }
         }
 
