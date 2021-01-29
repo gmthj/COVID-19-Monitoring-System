@@ -15,11 +15,15 @@ namespace CovidApp
         static void Main(string[] args)
         {
             //Initialisation
-            List<string[]> personDataList = new List<string[]>();
             List<Person> personList = new List<Person>();
             List<string> serialNoList = new List<string>();
             List<Resident> residentList = new List<Resident>();
             List<BusinessLocation> businessList = new List<BusinessLocation>();
+
+            Resident testResident = new Resident("Marc", "123 East Road", new DateTime(2020, 12, 20));
+            TraceTogetherToken testToken = new TraceTogetherToken("T23451", "test", new DateTime(2021, 2, 20));
+            testResident.Token = testToken;
+            residentList.Add(testResident);
             while (true)
             {
                 DisplayMenu();
@@ -50,31 +54,26 @@ namespace CovidApp
                 {
                     UpdateToken(residentList, serialNoList);
                     Console.WriteLine();
-                    continue;
                 }
 
                 else if (selectedOption == 6)
                 {
                     DisplayBusinessList(businessList);
-                    continue;
                 }
 
                 else if (selectedOption == 7)
                 {
                     EditLocationCapacity(businessList);
-                    continue;
                 }
 
                 else if (selectedOption == 8)
                 {
                     SafeEntryCheckIn(personList, businessList);
-                    continue;
                 }
 
                 else if (selectedOption == 9)
                 {
                     SafeEntryCheckOut(personList);
-                    continue;
                 }
 
                 else if (selectedOption == 10)
@@ -99,7 +98,7 @@ namespace CovidApp
 
                 else if (selectedOption == 14)
                 {
-
+                    ContactTracingReport(personList);
                 }
 
                 else if (selectedOption == 15)
@@ -111,6 +110,7 @@ namespace CovidApp
                 {
                     break;
                 }
+                Console.WriteLine();
             }
 
 
@@ -149,7 +149,6 @@ namespace CovidApp
             //    Console.WriteLine(r);
             //}
 
-            //UpdateToken() testing
             //Resident testResident = new Resident("Marc", "123 East Road", new DateTime(2020, 12, 20));
             //TraceTogetherToken testToken = new TraceTogetherToken("T23451", "test", new DateTime(2021, 2, 20));
             //testResident.Token = testToken;
@@ -263,7 +262,6 @@ namespace CovidApp
                 serialNo = "T" + randomNumber.ToString("D5");
                 if (serialNoList.Contains(serialNo))
                 {
-                    Console.WriteLine("Working");
                     continue;
                 }
                 else
@@ -389,7 +387,6 @@ namespace CovidApp
             Console.Write("Please enter new maximum capacity of business location: ");
             int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
             searchedLocation.MaximumCapacity = newMaxCapacity;
-            Console.WriteLine();
         }
 
         static void InitializePersonList(List<Person> personList, List<Resident> residentList, List<Visitor> visitorList)
@@ -423,7 +420,6 @@ namespace CovidApp
             if (safeEntryLocation.IsFull())
             {
                 Console.WriteLine("Unable to SafeEntry Check In as business location is at maximum capacity.");
-                Console.WriteLine();
             }
             else
             {
@@ -431,7 +427,6 @@ namespace CovidApp
                 safeEntryLocation.VisitorsNow += 1;
                 searchedPerson.AddSafeEntry(newSafeEntry);
                 Console.WriteLine("SafeEntry Entry Check In Successfull.");
-                Console.WriteLine();
             }
 
         }
@@ -440,6 +435,7 @@ namespace CovidApp
             int count = 1;
             Console.Write("Please enter the name of the person that is checking out: ");
             string personName = Console.ReadLine();
+            Console.WriteLine();
             Person searchedPerson = SearchPersonByName(personList, personName);
             foreach (SafeEntry se in searchedPerson.SafeEntryList)
             {
@@ -455,10 +451,43 @@ namespace CovidApp
             chosenSafeEntry.PerformCheckOut();
             chosenSafeEntry.Location.VisitorsNow -= 1;
             Console.WriteLine("Person with name {0} has been checked out of {1}.", personName, chosenSafeEntry.Location.BusinessName);
-            Console.WriteLine();
 
         }
-
-        
+        static void ContactTracingReport(List<Person> personList)
+        {
+            Console.Write("Please enter a Starting Date/Time (DD/MM/YYYY hh:mm:ss): ");
+            DateTime startingCheckTime = Convert.ToDateTime(Console.ReadLine());
+            Console.Write("Please enter a Ending Date/Time (DD/MM/YYYY hh:mm:ss): ");
+            DateTime endingCheckTime = Convert.ToDateTime(Console.ReadLine());
+            Console.Write("Please enter a Business Name: ");
+            string businessName = Console.ReadLine();
+            List<Person> CheckedInList = new List<Person>();
+            //foreach(Person p in personList)
+            //{
+            //    foreach(SafeEntry se in p.SafeEntryList)
+            //    {
+            //        if (se.Location.BusinessName == businessName && se.CheckIn > startingCheckTime && se.CheckOut<endingCheckTime)
+            //        {
+            //            CheckedInList.Add(p);
+            //        }
+            //    }
+            //}
+            using (StreamWriter sw = new StreamWriter("Contact_Tracing_Report.csv", false))
+            {
+                sw.WriteLine("Check In Date/Time, Check Out Date/Time, Location");
+                foreach (Person p in personList)
+                {
+                    foreach (SafeEntry se in p.SafeEntryList)
+                    {
+                        if (se.Location.BusinessName == businessName && se.CheckIn >= startingCheckTime && se.CheckOut <= endingCheckTime)
+                        {
+                            CheckedInList.Add(p);
+                            string data = Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
+                            sw.WriteLine(data);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
