@@ -18,7 +18,9 @@ namespace CovidApp
             List<Person> personList = new List<Person>();
             List<string> serialNoList = new List<string>();
             List<Resident> residentList = new List<Resident>();
+            List<Visitor> visitorList = new List<Visitor>();
             List<BusinessLocation> businessList = new List<BusinessLocation>();
+            List<SHNFacility> facilityList = new List<SHNFacility>();
 
             while (true)
             {
@@ -27,11 +29,10 @@ namespace CovidApp
                 if (selectedOption == 1) //Load Person and Business Location Data
                 {
                     ObtainResidentsData(serialNoList, residentList);
-                    //LoadVisitor()
+                    ObtainVisitorData(visitorList, facilityList);
                     ObtainBusinessesData(businessList);
-                    InitializePersonList(personList, residentList, null);
+                    InitializePersonList(personList, residentList, visitorList);
                     Console.WriteLine("Data has been loaded.");
-                    Console.WriteLine();
                 }
                 else if (selectedOption == 2) //Load SHN Facility Data
                 {
@@ -39,6 +40,14 @@ namespace CovidApp
                 }
                 else if (selectedOption == 3) //List All Visitors
                 {
+                    foreach (Visitor v in visitorList)//just testing
+                    {
+                        Console.WriteLine(v.ToString());
+                        foreach (TravelEntry te in v.TravelEntryList)
+                        {
+                            Console.WriteLine(te.ToString());
+                        }
+                    }
 
                 }
                 else if (selectedOption == 4) //List Person Details
@@ -113,7 +122,7 @@ namespace CovidApp
 
 
 
-            //random testing
+            //TESTING
             //foreach (string[] arr in personDataList)
             //{
             //    foreach (string data in arr)
@@ -151,8 +160,11 @@ namespace CovidApp
             //residentList.Add(testResident);
         }
 
-        //1) Load Person Data
-        static void LoadPersonData(List<string[]> personDataList)
+
+        // Methods below were coded by:
+        // Student Number : S10203190
+        // Student Name : Tan Hiang Joon Gabriel
+        static void ObtainVisitorData(List<Visitor> visitorList, List<SHNFacility> facilityList)
         {
             using (StreamReader sr = new StreamReader("csv files/Person.csv"))
             {
@@ -160,20 +172,45 @@ namespace CovidApp
                 while ((line = sr.ReadLine()) != null)
                 {
                     string[] splitLine = line.Split(",");
-                    personDataList.Add(splitLine);
+                    if (splitLine[0] == "visitor")
+                    {
+                        Visitor newVisitor = new Visitor(splitLine[1], splitLine[4], splitLine[5]);
+
+                        if (splitLine[9] != "")
+                        {
+                            newVisitor.AddTravelEntry(NewTravelEntry(splitLine[9], splitLine[10], Convert.ToDateTime(splitLine[11]), Convert.ToDateTime(splitLine[12]), Convert.ToBoolean(splitLine[13]), splitLine[14], facilityList));
+                        }
+                        
+                        visitorList.Add(newVisitor);
+                    }
                 }
             }
         }
 
-        static void LoadVisitor(List<string[]> personDataList, List<Person> personList) //wip
+        static TravelEntry NewTravelEntry(string travelEntryLastCountry, string travelEntryMode, DateTime travelEntryDate, DateTime travelShnEndDate, bool travelIsPaid, string facilityName, List<SHNFacility> facilityList)
         {
-            foreach (string[] personArray in personDataList)
+            TravelEntry te = new TravelEntry(travelEntryLastCountry, travelEntryMode, travelEntryDate);
+            te.IsPaid = travelIsPaid;
+            //te.AssignSHNFacility(SearchSHNFacility(facilityName, facilityList)); loading of shn facilities to be completed first
+            if (travelShnEndDate == null)
             {
-                if (personArray[0] == "visitor")
+                te.CalculateSHNDuration();
+            }
+
+            return te;
+        }
+
+        static SHNFacility SearchSHNFacility(string facilityName, List<SHNFacility> facilityList)
+        {
+            foreach (SHNFacility sf in facilityList)
+            {
+                if (sf.FacilityName == facilityName)
                 {
-                    personList.Add(new Visitor(personArray[1], personArray[4], personArray[5]));
+                    return sf;
                 }
             }
+            Console.WriteLine("\nERROR: facility name not found in SHN facility list\n"); //error message for testing.
+            return null;
         }
 
         // Methods below were coded by:
@@ -234,6 +271,22 @@ namespace CovidApp
             }
             return residentList;
         }
+
+        static void InitializePersonList(List<Person> personList, List<Resident> residentList, List<Visitor> visitorList)
+        {
+            foreach (Resident r in residentList)
+            {
+                personList.Add(r);
+            }
+            // Student Number : S10203190
+            // Student Name : Tan Hiang Joon Gabirel
+            foreach (Visitor v in visitorList)
+            {
+                personList.Add(v);
+            }
+            //end gabriel
+        }
+
         static Resident SearchResidentByName(List<Resident> residentList, string name)
         {
             foreach(Resident r in residentList)
@@ -385,13 +438,6 @@ namespace CovidApp
             searchedLocation.MaximumCapacity = newMaxCapacity;
         }
 
-        static void InitializePersonList(List<Person> personList, List<Resident> residentList, List<Visitor> visitorList)
-        {
-            foreach (Resident r in residentList)
-            {
-                personList.Add(r);
-            }
-        }
 
         static Person SearchPersonByName(List<Person> personList, string name)
         {
