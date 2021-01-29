@@ -22,12 +22,23 @@ namespace CovidApp
             List<BusinessLocation> businessList = new List<BusinessLocation>();
             List<SHNFacility> facilityList = new List<SHNFacility>();
 
+            ObtainResidentsData(serialNoList, residentList);
+            ObtainVisitorData(visitorList, facilityList);
+            ObtainBusinessesData(businessList);
+            InitializePersonList(personList, residentList, visitorList);
+            //load shn falcity datta
+
             while (true)
             {
                 DisplayMenu();
                 int selectedOption = ObtainMenuInput();
                 if (selectedOption == 1) //Load Person and Business Location Data
                 {
+                    residentList.Clear();
+                    serialNoList.Clear();
+                    visitorList.Clear();
+                    personList.Clear();
+                    businessList.Clear();
                     ObtainResidentsData(serialNoList, residentList);
                     ObtainVisitorData(visitorList, facilityList);
                     ObtainBusinessesData(businessList);
@@ -36,6 +47,7 @@ namespace CovidApp
                 }
                 else if (selectedOption == 2) //Load SHN Facility Data
                 {
+                    facilityList.Clear();
 
                 }
                 else if (selectedOption == 3) //List All Visitors
@@ -212,6 +224,10 @@ namespace CovidApp
             Console.WriteLine("\nERROR: facility name not found in SHN facility list\n"); //error message for testing.
             return null;
         }
+        // End of methods coded by:
+        // Student Number : S10203190
+        // Student Name : Tan Hiang Joon Gabriel
+
 
         // Methods below were coded by:
         // Student Number : S10203166
@@ -529,5 +545,9 @@ namespace CovidApp
                 }
             }
         }
+        // End of methods coded by:
+        // Student Number : S10203166
+        // Student Name : Marc Lim Liang Kiat
+
     }
 }
