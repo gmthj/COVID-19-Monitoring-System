@@ -243,7 +243,7 @@ namespace CovidApp
             int option = Convert.ToInt32(Console.ReadLine());
             return option;
         }
-        static List<Resident> ObtainResidentsData(List<string> serialNoList, List<Resident> residentList)
+        static void ObtainResidentsData(List<string> serialNoList, List<Resident> residentList)
         {
             using (StreamReader sr = new StreamReader("csv files/Person.csv"))
             {
@@ -269,7 +269,6 @@ namespace CovidApp
                     }
                 }
             }
-            return residentList;
         }
 
         static void InitializePersonList(List<Person> personList, List<Resident> residentList, List<Visitor> visitorList)
@@ -386,7 +385,7 @@ namespace CovidApp
                 Console.WriteLine("Resident with name {0} does not exist.", residentName);
             }
         }
-        static List<BusinessLocation> ObtainBusinessesData(List<BusinessLocation> businessList)
+        static void ObtainBusinessesData(List<BusinessLocation> businessList)
         {
             using (StreamReader sr = new StreamReader("csv files/BusinessLocation.csv"))
             {
@@ -398,7 +397,6 @@ namespace CovidApp
                     businessList.Add(newBusiness);
                 }
             }
-            return businessList;
         }
         static void DisplayBusinessList(List<BusinessLocation> businessList)
         {
