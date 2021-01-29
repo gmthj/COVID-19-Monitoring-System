@@ -18,8 +18,11 @@ namespace CovidApp
             List<string[]> personDataList = new List<string[]>();
             List<Person> personList = new List<Person>();
             List<string> serialNoList = new List<string>();
-            List<Resident> residentList = ObtainResidentsData(serialNoList);
-            List<BusinessLocation> businessList = ObtainBusinessesData();
+            List<Resident> residentList = new List<Resident>();
+            List<BusinessLocation> businessList = new List<BusinessLocation>();
+            ObtainResidentsData(serialNoList, residentList);
+            ObtainBusinessesData(businessList);
+            InitializePersonList(personList, residentList, null);
             while (true)
             {
                 DisplayMenu();
@@ -28,39 +31,36 @@ namespace CovidApp
                 {
 
                 }
-
                 else if (selectedOption == 2)
                 {
 
                 }
-
                 else if (selectedOption == 3)
+                {
+
+                }
+                else if (selectedOption == 4)
+                {
+
+                }
+
+                else if (selectedOption == 5)
                 {
                     UpdateToken(residentList, serialNoList);
                     Console.WriteLine();
                     continue;
                 }
 
-                else if (selectedOption == 4)
+                else if (selectedOption == 6)
                 {
                     DisplayBusinessList(businessList);
                     continue;
                 }
 
-                else if (selectedOption == 5)
+                else if (selectedOption == 7)
                 {
                     EditLocationCapacity(businessList);
                     continue;
-                }
-
-                else if (selectedOption == 6)
-                {
-
-                }
-
-                else if (selectedOption == 7)
-                {
-
                 }
 
                 else if (selectedOption == 8)
@@ -94,6 +94,16 @@ namespace CovidApp
                 }
 
                 else if (selectedOption == 14)
+                {
+
+                }
+
+                else if (selectedOption == 15)
+                {
+
+                }
+
+                else if (selectedOption == 16)
                 {
                     break;
                 }
@@ -173,20 +183,22 @@ namespace CovidApp
         static void DisplayMenu()
         {
             Console.WriteLine("******************Menu******************");
-            Console.WriteLine("[1]  List All Visitors");
-            Console.WriteLine("[2]  List Person Details");
-            Console.WriteLine("[3]  Assign/Replace TraceTogether Token");
-            Console.WriteLine("[4]  List All Business Locations");
-            Console.WriteLine("[5]  Edit Business Location Capacity");
-            Console.WriteLine("[6]  SafeEntry Check-in");
-            Console.WriteLine("[7]  SafeEntry Check-out");
-            Console.WriteLine("[8]  List All SHN Facilities");
-            Console.WriteLine("[9]  Create Visitor");
-            Console.WriteLine("[10] Create TravelEntry Record");
-            Console.WriteLine("[11] Calculate SHN Charges");
-            Console.WriteLine("[12] Contact Tracing Reporting");
-            Console.WriteLine("[13] SHN Status Reporting");
-            Console.WriteLine("[14] Exit");
+            Console.WriteLine("[1]  Load Person and Business Location Data");
+            Console.WriteLine("[2]  Load SHN Facility Data");
+            Console.WriteLine("[3]  List All Visitors");
+            Console.WriteLine("[4]  List Person Details");
+            Console.WriteLine("[5]  Assign/Replace TraceTogether Token");
+            Console.WriteLine("[6]  List All Business Locations");
+            Console.WriteLine("[7]  Edit Business Location Capacity");
+            Console.WriteLine("[8]  SafeEntry Check-in");
+            Console.WriteLine("[9]  SafeEntry Check-out");
+            Console.WriteLine("[10]  List All SHN Facilities");
+            Console.WriteLine("[11]  Create Visitor");
+            Console.WriteLine("[12] Create TravelEntry Record");
+            Console.WriteLine("[13] Calculate SHN Charges");
+            Console.WriteLine("[14] Contact Tracing Reporting");
+            Console.WriteLine("[15] SHN Status Reporting");
+            Console.WriteLine("[16] Exit");
         }
 
         static int ObtainMenuInput()
@@ -195,9 +207,8 @@ namespace CovidApp
             int option = Convert.ToInt32(Console.ReadLine());
             return option;
         }
-        static List<Resident> ObtainResidentsData(List<string> serialNoList)
+        static List<Resident> ObtainResidentsData(List<string> serialNoList, List<Resident> residentList)
         {
-            List<Resident> residentList = new List<Resident>();
             using (StreamReader sr = new StreamReader("csv files/Person.csv"))
             {
                 string line = sr.ReadLine();
@@ -324,9 +335,8 @@ namespace CovidApp
                 Console.WriteLine("Resident with name {0} does not exist.", residentName);
             }
         }
-        static List<BusinessLocation> ObtainBusinessesData()
+        static List<BusinessLocation> ObtainBusinessesData(List<BusinessLocation> businessList)
         {
-            List<BusinessLocation> businessList = new List<BusinessLocation>();
             using (StreamReader sr = new StreamReader("csv files/BusinessLocation.csv"))
             {
                 string line = sr.ReadLine();
@@ -345,7 +355,7 @@ namespace CovidApp
             Console.WriteLine();
             foreach(BusinessLocation b in businessList)
             {
-                Console.WriteLine("Business Location {0}", Convert.ToString(businessCount));
+                Console.WriteLine("Business Location [{0}]", Convert.ToString(businessCount));
                 Console.WriteLine("Business Name: {0}",b.BusinessName);
                 Console.WriteLine("Branch Code: {0}",b.BranchCode);
                 Console.WriteLine("Maximum Capacity: {0}",b.MaximumCapacity);
@@ -375,6 +385,37 @@ namespace CovidApp
             Console.Write("Please enter new maximum capacity of business location: ");
             int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
             searchedLocation.MaximumCapacity = newMaxCapacity;
+            Console.WriteLine();
         }
+
+        static void InitializePersonList(List<Person> personList, List<Resident> residentList, List<Visitor> visitorList)
+        {
+            foreach (Resident r in residentList)
+            {
+                personList.Add(r);
+            }
+        }
+
+        static Person SearchPersonByName(List<Person> personList, string name)
+        {
+            foreach(Person p in personList)
+            {
+                if (p.Name == name)
+                {
+                    return p;
+                }
+            }
+            return null;
+        }
+        //static void SafeEntryCheckIn(List<Person> personList, List<BusinessLocation> businessList)
+        //{
+        //    Console.Write("Please enter the name of the person that is checking in: ");
+        //    string personName = Console.ReadLine();
+        //    Person searchedPerson = SearchPersonByName(personList, personName);
+        //    DisplayBusinessList(businessList);
+        //    Console.Write("Please enter the business location number (0, 1, 2, etc.) of the business location that is being checked in to: ");
+        //    int locationNumber = Convert.ToInt32(Console.ReadLine());
+
+        //}
     }
 }
