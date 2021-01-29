@@ -295,7 +295,6 @@ namespace CovidApp
                                 TraceTogetherToken newToken = new TraceTogetherToken(formattedLine[6], formattedLine[7], Convert.ToDateTime(formattedLine[8]));
                                 newResident.Token = newToken;
                                 serialNoList.Add(newToken.SerialNo);
-                                residentList.Add(newResident);
                             }
                             if (formattedLine[9] != "")
                             {
@@ -397,7 +396,7 @@ namespace CovidApp
                     TraceTogetherToken newToken = new TraceTogetherToken(serialNo, collectionLocation, expiryDate);
                     searchedResident.Token = newToken;
                     Console.WriteLine();
-                    Console.WriteLine("Sucess, new TraceTogether Token has been assigned to resident with name {0}.", residentName);
+                    Console.WriteLine("Success, new TraceTogether Token has been assigned to resident with name {0}.", residentName);
                     Console.WriteLine();
                     Console.WriteLine("Newly Assigned TraceTogether Token has the following details.");
                     Console.WriteLine("Serial No: {0}", newToken.SerialNo);
@@ -535,7 +534,6 @@ namespace CovidApp
                             SafeEntry newSafeEntry = new SafeEntry(DateTime.Now, safeEntryLocation);
                             safeEntryLocation.VisitorsNow += 1;
                             searchedPerson.AddSafeEntry(newSafeEntry);
-                            Console.WriteLine("SafeEntry Entry Check In Successfull.");
                         }
                     }
                     else
@@ -578,7 +576,7 @@ namespace CovidApp
                     }
                     Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
                     int chosenRecord = Convert.ToInt32(Console.ReadLine());
-                    if (chosenRecord >0 && chosenRecord < searchedPerson.SafeEntryList.Count)
+                    if (chosenRecord >0 && chosenRecord <= searchedPerson.SafeEntryList.Count)
                     {
                         SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord - 1];
                         chosenSafeEntry.PerformCheckOut();
@@ -602,38 +600,51 @@ namespace CovidApp
         }
         static void ContactTracingReport(List<Person> personList)
         {
-            Console.Write("Please enter a Starting Date/Time (DD/MM/YYYY hh:mm:ss): ");
-            DateTime startingCheckTime = Convert.ToDateTime(Console.ReadLine());
-            Console.Write("Please enter a Ending Date/Time (DD/MM/YYYY hh:mm:ss): ");
-            DateTime endingCheckTime = Convert.ToDateTime(Console.ReadLine());
-            Console.Write("Please enter a Business Name: ");
-            string businessName = Console.ReadLine();
-            List<Person> CheckedInList = new List<Person>();
-            //foreach(Person p in personList)
-            //{
-            //    foreach(SafeEntry se in p.SafeEntryList)
-            //    {
-            //        if (se.Location.BusinessName == businessName && se.CheckIn > startingCheckTime && se.CheckOut<endingCheckTime)
-            //        {
-            //            CheckedInList.Add(p);
-            //        }
-            //    }
-            //}
-            using (StreamWriter sw = new StreamWriter("Contact_Tracing_Report.csv", false))
+            try
             {
-                sw.WriteLine("Check In Date/Time, Check Out Date/Time, Location");
-                foreach (Person p in personList)
+                Console.Write("Please enter a Starting Date/Time (DD/MM/YYYY hh:mm:ss): ");
+                DateTime startingCheckTime = Convert.ToDateTime(Console.ReadLine());
+                Console.Write("Please enter a Ending Date/Time (DD/MM/YYYY hh:mm:ss): ");
+                DateTime endingCheckTime = Convert.ToDateTime(Console.ReadLine());
+                Console.Write("Please enter a Business Name: ");
+                string businessName = Console.ReadLine();
+                List<Person> CheckedInList = new List<Person>();
+                //foreach(Person p in personList)
+                //{
+                //    foreach(SafeEntry se in p.SafeEntryList)
+                //    {
+                //        if (se.Location.BusinessName == businessName && se.CheckIn > startingCheckTime && se.CheckOut<endingCheckTime)
+                //        {
+                //            CheckedInList.Add(p);
+                //        }
+                //    }
+                //}
+                using (StreamWriter sw = new StreamWriter("Contact_Tracing_Report.csv", false))
                 {
-                    foreach (SafeEntry se in p.SafeEntryList)
+                    bool exist = false;
+                    sw.WriteLine("Check In Date/Time, Check Out Date/Time, Location");
+                    foreach (Person p in personList)
                     {
-                        if (se.Location.BusinessName == businessName && se.CheckIn >= startingCheckTime && se.CheckOut <= endingCheckTime)
+                        foreach (SafeEntry se in p.SafeEntryList)
                         {
-                            CheckedInList.Add(p);
-                            string data = Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
-                            sw.WriteLine(data);
+                            if (se.Location.BusinessName == businessName && se.CheckIn >= startingCheckTime && se.CheckOut <= endingCheckTime)
+                            {
+                                CheckedInList.Add(p);
+                                string data = Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
+                                sw.WriteLine(data);
+                                exist = true;
+                            }
                         }
                     }
+                    if (exist == false)
+                    {
+                        Console.WriteLine("Business Location with name {0} not found", businessName);
+                    }
                 }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Input string is not in the correct date format, input string should be in format of (DD/MM/YYYY hh:mm:ss). Please try again.");
             }
         }
         // End of methods coded by:
