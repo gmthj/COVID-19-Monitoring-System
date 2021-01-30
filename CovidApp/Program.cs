@@ -243,7 +243,7 @@ namespace CovidApp
                     readTask.Wait();
                     string data = readTask.Result;
                     tempFacilityList = JsonConvert.DeserializeObject<List<SHNFacility>>(data);
-                    foreach (SHNFacility sf in tempFacilityList) //bootleg solution but hey it works:)
+                    foreach (SHNFacility sf in tempFacilityList)
                     {
                         facilityList.Add(new SHNFacility(sf.FacilityName, sf.FacilityCapacity, sf.DistFromAirCheckpoint, sf.DistFromSeaCheckpoint, sf.DistFromLandCheckpoint));
                     }
@@ -412,7 +412,7 @@ namespace CovidApp
                 string entryMode = Console.ReadLine();
                 while (entryMode != "Air" && entryMode != "Sea" && entryMode != "Land" && entryMode != "-1")
                 {
-                    Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again.", entryMode);
+                    Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again. Use: 'Air', 'Sea' or 'Land'", entryMode);
                     Console.Write("Enter Entry Mode: ");
                     entryMode = Console.ReadLine();
                 }
@@ -431,7 +431,7 @@ namespace CovidApp
                         {
                             Console.WriteLine("Invalid date. Date must not be later than current date. Please try again.");
                         }
-                        else if (entryDate >= p.TravelEntryList[p.TravelEntryList.Count - 1].EntryDate && entryDate <= p.TravelEntryList[p.TravelEntryList.Count - 1].ShnEndDate)
+                        else if (p.TravelEntryList.Count != 0 && entryDate >= p.TravelEntryList[p.TravelEntryList.Count - 1].EntryDate && entryDate <= p.TravelEntryList[p.TravelEntryList.Count - 1].ShnEndDate)
                         {
                             Console.WriteLine("{0} is still serving another SHN on {1}.", name, entryDate);
                         }
@@ -439,17 +439,30 @@ namespace CovidApp
                         {
                             TravelEntry te = new TravelEntry(lastCountryOfEmbarkation, entryMode, entryDate);
                             //CalculateSHNDuration() called in TravelEntry class constructor
-                            List<SHNFacility> avaSHNFacility = GetAvailableSHNFacilities(facilityList);
-                            if (avaSHNFacility.Count == 0)
+                            if (te.ShnEndDate == te.EntryDate)
                             {
-                                Console.WriteLine("All our SHN facilities are at maximum capacity. Please Contact PM Lee Hsien Loong for further assitance or go back to {0} i don't know", lastCountryOfEmbarkation);
+                                personList[personIndex].TravelEntryList.Add(te);
+                                Console.WriteLine("Successfully added TravelEntry for {0}.", name);
+                            }
+                            if ((te.ShnEndDate - te.EntryDate).Days == 7)
+                            {
+                                personList[personIndex].TravelEntryList.Add(te);
+                                Console.WriteLine("Successfully added TravelEntry for {0} from {1} to {2}.", name, te.EntryDate, te.ShnEndDate);
                             }
                             else
                             {
-                                te.AssignSHNFacility(SelectSHNFacility(avaSHNFacility));
-                                te.ShnStay.FacilityVacancy--;
-                                personList[personIndex].TravelEntryList.Add(te);
-                                Console.WriteLine("sucess");
+                                List<SHNFacility> avaSHNFacility = GetAvailableSHNFacilities(facilityList);
+                                if (avaSHNFacility.Count == 0)
+                                {
+                                    Console.WriteLine("All our SHN facilities are at maximum capacity. Please Contact PM Lee Hsien Loong for further assitance or go back to {0} i don't know", lastCountryOfEmbarkation);
+                                }
+                                else
+                                {
+                                    te.AssignSHNFacility(SelectSHNFacility(avaSHNFacility));
+                                    te.ShnStay.FacilityVacancy--;
+                                    personList[personIndex].TravelEntryList.Add(te);
+                                    Console.WriteLine("Successfully added TravelEntry for {0} at {1} from {2} to {3}.", name, te.ShnStay.FacilityName, te.EntryDate, te.ShnEndDate);
+                                }
                             }
                         }
                     }
@@ -485,18 +498,18 @@ namespace CovidApp
 
         static SHNFacility SelectSHNFacility(List<SHNFacility> avaSHNFacility)
         {
-            Console.WriteLine("Avaliable SHN Facilities:");
+            Console.WriteLine("\nAvaliable SHN Facilities:");
             DisplaySHNFacilitiesDetails(avaSHNFacility);
       
             while (true)
             {
                 try
                 {
-                    Console.Write("Enter Facility Number: ");
+                    Console.Write("\nEnter Facility Number: ");
                     int option = Convert.ToInt32(Console.ReadLine());
                     if (option > avaSHNFacility.Count || option < 1)
                     {
-                        Console.WriteLine("Error: Invalid Facility Number. Please try again.");
+                        Console.WriteLine("Error: Invalid Facility Number. Please try again. Use: 1 - {0}", avaSHNFacility.Count);
                     }
                     else
                     {
@@ -509,6 +522,8 @@ namespace CovidApp
                 }
             }
         }
+
+
 
         // End of methods coded by:
         // Student Number : S10203190
