@@ -102,7 +102,7 @@ namespace CovidApp
 
                 else if (selectedOption == 12) //Create TravelEntry Record
                 {
-
+                    CreateTravelEntryRecord(personList, facilityList);
                 }
 
                 else if (selectedOption == 13) //Calculate SHN Charges
@@ -207,6 +207,10 @@ namespace CovidApp
             {
                 te.CalculateSHNDuration();
             }
+            else
+            {
+                te.ShnEndDate = travelShnEndDate;
+            }
 
             return te;
         }
@@ -304,6 +308,7 @@ namespace CovidApp
                     Console.WriteLine("Check In Date And Time: {0}", se.CheckOut);
                     Console.WriteLine("Business Location: {0}", se.Location);
                     //end marc
+                    safeEntryCount++;
                 }
                 
                 int travelEntryCount = 1;
@@ -323,6 +328,7 @@ namespace CovidApp
                         Console.WriteLine("SHN Facility Name: " + te.ShnStay.FacilityName);
                     }
                     Console.WriteLine("Is Paid: " + te.IsPaid);
+                    travelEntryCount++;
                 }
             }
             else
@@ -379,9 +385,130 @@ namespace CovidApp
             }
         }
 
+        static void CreateTravelEntryRecord(List<Person> personList, List<SHNFacility> facilityList)
+        {
+            List<string> existingNameList = new List<string>();
+            foreach (Person person in personList)
+            {
+                existingNameList.Add(person.Name);
+            }
 
+            Console.Write("Enter person name: ");
+            string name = Console.ReadLine();
+            while (!existingNameList.Contains(name) && name != "-1")
+            {
+                Console.WriteLine("Error: {0} not found. Please try again.", name);
+                Console.Write("Enter person name: ");
+                name = Console.ReadLine();
+            }
+            if (name != "-1")
+            {
+                Person p = SearchPersonByName(personList, name);
+                int personIndex = personList.IndexOf(SearchPersonByName(personList, name));
 
+                Console.Write("Enter Last Country Of Embarkation: ");
+                string lastCountryOfEmbarkation = Console.ReadLine();
+                Console.Write("Enter Entry Mode: ");
+                string entryMode = Console.ReadLine();
+                while (entryMode != "Air" && entryMode != "Sea" && entryMode != "Land" && entryMode != "-1")
+                {
+                    Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again.", entryMode);
+                    Console.Write("Enter Entry Mode: ");
+                    entryMode = Console.ReadLine();
+                }
+                if (entryMode != "-1")
+                {
+                    try
+                    {
+                        DateTime entryDate = DateTime.Now;
+                        Console.Write("Enter Entry Date: ");
+                        string strEntryDate = Console.ReadLine();
+                        if (strEntryDate != "")
+                        {
+                            entryDate = Convert.ToDateTime(strEntryDate);
+                        }
+                        if (entryDate > DateTime.Now)
+                        {
+                            Console.WriteLine("Invalid date. Date must not be later than current date. Please try again.");
+                        }
+                        else if (entryDate >= p.TravelEntryList[p.TravelEntryList.Count - 1].EntryDate && entryDate <= p.TravelEntryList[p.TravelEntryList.Count - 1].ShnEndDate)
+                        {
+                            Console.WriteLine("{0} is still serving another SHN on {1}.", name, entryDate);
+                        }
+                        else
+                        {
+                            TravelEntry te = new TravelEntry(lastCountryOfEmbarkation, entryMode, entryDate);
+                            //CalculateSHNDuration() called in TravelEntry class constructor
+                            List<SHNFacility> avaSHNFacility = GetAvailableSHNFacilities(facilityList);
+                            if (avaSHNFacility.Count == 0)
+                            {
+                                Console.WriteLine("All our SHN facilities are at maximum capacity. Please Contact PM Lee Hsien Loong for further assitance or go back to {0} i don't know", lastCountryOfEmbarkation);
+                            }
+                            else
+                            {
+                                te.AssignSHNFacility(SelectSHNFacility(avaSHNFacility));
+                                te.ShnStay.FacilityVacancy--;
+                                personList[personIndex].TravelEntryList.Add(te);
+                                Console.WriteLine("sucess");
+                            }
+                        }
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Invalid date format. Please try again.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Cancelled Creating Travel Entry Record.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Cancelled Creating Travel Entry Record.");
+            }
+            
+        }
 
+        static List<SHNFacility> GetAvailableSHNFacilities(List<SHNFacility> facilityList)
+        {
+            List<SHNFacility> avaSHNFacility = new List<SHNFacility>();
+            foreach (SHNFacility sf in facilityList)
+            {
+                if (sf.FacilityVacancy != 0)
+                {
+                    avaSHNFacility.Add(sf);
+                }
+            }
+            return avaSHNFacility;
+        }
+
+        static SHNFacility SelectSHNFacility(List<SHNFacility> avaSHNFacility)
+        {
+            Console.WriteLine("Avaliable SHN Facilities:");
+            DisplaySHNFacilitiesDetails(avaSHNFacility);
+      
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Enter Facility Number: ");
+                    int option = Convert.ToInt32(Console.ReadLine());
+                    if (option > avaSHNFacility.Count || option < 1)
+                    {
+                        Console.WriteLine("Error: Invalid Facility Number. Please try again.");
+                    }
+                    else
+                    {
+                        return avaSHNFacility[option - 1];
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+                }
+            }
+        }
 
         // End of methods coded by:
         // Student Number : S10203190
