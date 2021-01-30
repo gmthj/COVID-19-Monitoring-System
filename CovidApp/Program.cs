@@ -107,7 +107,7 @@ namespace CovidApp
 
                 else if (selectedOption == 13) //Calculate SHN Charges
                 {
-
+                    MakePayment(personList, facilityList);
                 }
 
                 else if (selectedOption == 14) //Contact Tracing Reporting
@@ -523,7 +523,95 @@ namespace CovidApp
             }
         }
 
+        static void MakePayment(List<Person> personList, List<SHNFacility> facilityList)
+        {
+            List<string> existingNameList = new List<string>();
+            foreach (Person person in personList)
+            {
+                existingNameList.Add(person.Name);
+            }
 
+            Console.Write("Enter person name: ");
+            string name = Console.ReadLine();
+            while (!existingNameList.Contains(name) && name != "-1")
+            {
+                Console.WriteLine("Error: {0} not found. Please try again.", name);
+                Console.Write("Enter person name: ");
+                name = Console.ReadLine();
+            }
+            if (name != "-1")
+            {
+                Person p = SearchPersonByName(personList, name);
+                //int personIndex = personList.IndexOf(SearchPersonByName(personList, name));
+
+                if (p.TravelEntryList.Count == 0)
+                {
+                    Console.WriteLine("No Travel Entry Records found for {0}. No Payments need to be made.", name);
+                }
+                else
+                {
+                    List<TravelEntry> unpaidTE = new List<TravelEntry>();
+                    foreach (TravelEntry te in p.TravelEntryList)
+                    {
+                        if (!te.IsPaid && te.ShnEndDate < DateTime.Now)
+                        {
+                            unpaidTE.Add(te);
+                        }
+                    }
+
+                    if (unpaidTE.Count == 0)
+                    {
+                        Console.WriteLine("All SHN charges of completed SHNs for {0} have been paid.", name);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Completed and unpaid SHN charges for {0}:", name);
+                        int travelEntryCount = 1;
+                        foreach (TravelEntry upte in unpaidTE)
+                        {
+                            Console.WriteLine("\nTravel Entry Record Number [" + travelEntryCount + "]");
+                            Console.WriteLine("Last Country Of Embarkation: " + upte.LastCountryOfEmbarkation);
+                            Console.WriteLine("Entry Mode: " + upte.EntryMode);
+                            Console.WriteLine("Entry Date: " + upte.EntryDate);
+                            Console.WriteLine("Shn End Date: " + upte.ShnEndDate);
+                            if (upte.ShnStay == null)
+                            {
+                                Console.WriteLine("SHN Facility Name: None");
+                            }
+                            else
+                            {
+                                Console.WriteLine("SHN Facility Name: " + upte.ShnStay.FacilityName);
+                            }
+                            Console.WriteLine("Is Paid: " + upte.IsPaid);
+                            Console.WriteLine("SHN Charges: " + p.CalculateSHNCharges());
+
+                            Console.Write("\nWould you like to pay for this?(Y/N): ");
+                            string choice = Console.ReadLine();
+                            while (choice != "Y" && choice != "N" && choice != "Yes" && choice != "No")
+                            {
+                                Console.WriteLine("Invalid input. Use: 'Y', 'N', 'Yes' or 'No'");
+                                Console.Write("Would you like to pay for this?(Y/N): ");
+                                choice = Console.ReadLine();
+                            }
+                            if(choice == "Y" || choice == "Yes")
+                            {
+                                upte.IsPaid = true;
+                                Console.WriteLine("Payment Made Successfully.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Payment Cancelled.");
+                            }
+                            travelEntryCount++;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Cancelled Making Payment.");
+            }
+        }
 
         // End of methods coded by:
         // Student Number : S10203190
