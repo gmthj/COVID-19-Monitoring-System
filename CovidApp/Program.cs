@@ -398,7 +398,7 @@ namespace CovidApp
             while (!existingNameList.Contains(name) && name != "-1")
             {
                 Console.WriteLine("Error: {0} not found. Please try again.", name);
-                Console.Write("Enter person name: ");
+                Console.Write("Enter person name [or -1 to escape]: ");
                 name = Console.ReadLine();
             }
             if (name != "-1")
@@ -412,8 +412,8 @@ namespace CovidApp
                 string entryMode = Console.ReadLine();
                 while (entryMode != "Air" && entryMode != "Sea" && entryMode != "Land" && entryMode != "-1")
                 {
-                    Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again. Use: 'Air', 'Sea' or 'Land'", entryMode);
-                    Console.Write("Enter Entry Mode: ");
+                    Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again. Use: \"Air\", \"Sea\" or \"Land\"", entryMode);
+                    Console.Write("Enter Entry Mode [or -1 to escape]: ");
                     entryMode = Console.ReadLine();
                 }
                 if (entryMode != "-1")
@@ -421,7 +421,7 @@ namespace CovidApp
                     try
                     {
                         DateTime entryDate = DateTime.Now;
-                        Console.Write("Enter Entry Date: ");
+                        Console.Write("Enter Entry Date [or press enter to use current date/time]: ");
                         string strEntryDate = Console.ReadLine();
                         if (strEntryDate != "")
                         {
@@ -536,7 +536,7 @@ namespace CovidApp
             while (!existingNameList.Contains(name) && name != "-1")
             {
                 Console.WriteLine("Error: {0} not found. Please try again.", name);
-                Console.Write("Enter person name: ");
+                Console.Write("Enter person name [or -1 to escape]: ");
                 name = Console.ReadLine();
             }
             if (name != "-1")
