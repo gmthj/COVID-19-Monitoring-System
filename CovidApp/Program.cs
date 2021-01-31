@@ -366,7 +366,7 @@ namespace CovidApp
             while (existingNameList.Contains(newName) && newName != "-1")
             {
                 Console.WriteLine("Error: {0} already exists. Please use a different name.", newName);
-                Console.Write("Enter visitor name: ");
+                Console.Write("Enter visitor name [or -1 to escape]: ");
                 newName = Console.ReadLine();
             }
             if (newName != "-1")
