@@ -122,7 +122,7 @@ namespace CovidApp
 
                 else if (selectedOption == 16) //Exit
                 {
-                    Console.WriteLine("Exit.");
+                    Console.WriteLine("Exiting Now.");
                     break;
                 }
                 Console.WriteLine();
@@ -816,7 +816,7 @@ namespace CovidApp
 
         static void UpdateToken(List<Person> personList, List<string> serialNoList)
         {
-            Console.Write("Please enter name of resident: ");
+            Console.Write("Please enter name of resident (Case Sensative): ");
             string residentName = Console.ReadLine();
             Resident searchedResident = SearchResidentByName(personList, residentName);
             if (searchedResident != null)
@@ -903,7 +903,7 @@ namespace CovidApp
         }
         static BusinessLocation SearchBusinessLocation(List<BusinessLocation> businessList)
         {
-            Console.Write("Pleae enter the name of the business: ");
+            Console.Write("Pleae enter the name of the business (Case Sensative): ");
             string businessName = Console.ReadLine();
             Console.Write("Please enter the branch code of business location: ");
             string branchCode = Console.ReadLine();
@@ -924,7 +924,7 @@ namespace CovidApp
                 BusinessLocation searchedLocation = SearchBusinessLocation(businessList);
                 if (searchedLocation != null)
                 {
-                    Console.Write("Please enter new maximum capacity of business location: ");
+                    Console.Write("Please enter new maximum capacity of business location (any positive integer): ");
                     int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
                     searchedLocation.MaximumCapacity = newMaxCapacity;
                 }
@@ -955,7 +955,7 @@ namespace CovidApp
         {
             try
             {
-                Console.Write("Please enter the name of the person that is checking in: ");
+                Console.Write("Please enter the name of the person that is checking in (Case Sensative): ");
                 string personName = Console.ReadLine();
                 Person searchedPerson = SearchPersonByName(personList, personName);
                 if (searchedPerson != null)
@@ -998,7 +998,7 @@ namespace CovidApp
             try
             {
                 int count = 1;
-                Console.Write("Please enter the name of the person that is checking out: ");
+                Console.Write("Please enter the name of the person that is checking out (Case Sensative): ");
                 string personName = Console.ReadLine();
                 Console.WriteLine();
                 Person searchedPerson = SearchPersonByName(personList, personName);
@@ -1047,7 +1047,7 @@ namespace CovidApp
                 DateTime startingCheckTime = Convert.ToDateTime(Console.ReadLine());
                 Console.Write("Please enter a Ending Date/Time (DD/MM/YYYY hh:mm:ss): ");
                 DateTime endingCheckTime = Convert.ToDateTime(Console.ReadLine());
-                Console.Write("Please enter a Business Name: ");
+                Console.Write("Please enter a Business Name (Case Sensative): ");
                 string businessName = Console.ReadLine();
                 List<Person> CheckedInList = new List<Person>();
                 //foreach(Person p in personList)
