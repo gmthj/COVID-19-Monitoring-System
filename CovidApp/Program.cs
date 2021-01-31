@@ -583,7 +583,7 @@ namespace CovidApp
                                 Console.WriteLine("SHN Facility Name: " + upte.ShnStay.FacilityName);
                             }
                             Console.WriteLine("Is Paid: " + upte.IsPaid);
-                            Console.WriteLine("SHN Charges: " + p.CalculateSHNCharges());
+                            Console.WriteLine("SHN Charges: $" + Math.Round(p.CalculateSHNCharges(),2));//test
 
                             Console.Write("\nWould you like to pay for this?(Y/N): ");
                             string choice = Console.ReadLine();
