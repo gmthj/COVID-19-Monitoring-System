@@ -43,7 +43,7 @@ namespace CovidApp
                     personList.Clear();
                     businessList.Clear();
                     facilityList.Clear();
-                    ObtainSHNFacilityData(facilityList); //this is here because to intialise personList, the TravelEntry requires there needs to be SHNFacilities to assign the person to as indicated in the person.csv file
+                    ObtainSHNFacilityData(facilityList); //this is here because to intialise personList, the TravelEntry requires there to be SHNFacilities to assign the person to as indicated in the person.csv file
                     ObtainResidentsData(serialNoList, residentList, facilityList);
                     ObtainVisitorData(visitorList, facilityList);
                     ObtainBusinessesData(businessList);
@@ -583,7 +583,7 @@ namespace CovidApp
                                 Console.WriteLine("SHN Facility Name: " + upte.ShnStay.FacilityName);
                             }
                             Console.WriteLine("Is Paid: " + upte.IsPaid);
-                            Console.WriteLine("SHN Charges: $" + Math.Round(p.CalculateSHNCharges(),2));//test
+                            Console.WriteLine("SHN Charges: $" + Math.Round(p.CalculateSHNCharges(),2));
 
                             Console.Write("\nWould you like to pay for this?(Y/N): ");
                             string choice = Console.ReadLine();
