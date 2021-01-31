@@ -43,7 +43,7 @@ namespace CovidApp
                     personList.Clear();
                     businessList.Clear();
                     facilityList.Clear();
-                    ObtainSHNFacilityData(facilityList); //this is here because to intialise personList, the TravelEntry requires there needs to be SHNFacilities to assign the person to as indicated in the person.csv file
+                    ObtainSHNFacilityData(facilityList); //this is here because to intialise personList, the TravelEntry requires there to be SHNFacilities to assign the person to as indicated in the person.csv file
                     ObtainResidentsData(serialNoList, residentList, facilityList);
                     ObtainVisitorData(visitorList, facilityList);
                     ObtainBusinessesData(businessList);
@@ -117,7 +117,7 @@ namespace CovidApp
 
                 else if (selectedOption == 15) //SHN Status Reporting
                 {
-
+                    ReportSHNStatus(personList);
                 }
 
                 else if (selectedOption == 16) //Exit
@@ -366,7 +366,7 @@ namespace CovidApp
             while (existingNameList.Contains(newName) && newName != "-1")
             {
                 Console.WriteLine("Error: {0} already exists. Please use a different name.", newName);
-                Console.Write("Enter visitor name: ");
+                Console.Write("Enter visitor name [or -1 to escape]: ");
                 newName = Console.ReadLine();
             }
             if (newName != "-1")
@@ -398,7 +398,7 @@ namespace CovidApp
             while (!existingNameList.Contains(name) && name != "-1")
             {
                 Console.WriteLine("Error: {0} not found. Please try again.", name);
-                Console.Write("Enter person name: ");
+                Console.Write("Enter person name [or -1 to escape]: ");
                 name = Console.ReadLine();
             }
             if (name != "-1")
@@ -412,8 +412,8 @@ namespace CovidApp
                 string entryMode = Console.ReadLine();
                 while (entryMode != "Air" && entryMode != "Sea" && entryMode != "Land" && entryMode != "-1")
                 {
-                    Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again. Use: 'Air', 'Sea' or 'Land'", entryMode);
-                    Console.Write("Enter Entry Mode: ");
+                    Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again. Use: \"Air\", \"Sea\" or \"Land\"", entryMode);
+                    Console.Write("Enter Entry Mode [or -1 to escape]: ");
                     entryMode = Console.ReadLine();
                 }
                 if (entryMode != "-1")
@@ -421,7 +421,7 @@ namespace CovidApp
                     try
                     {
                         DateTime entryDate = DateTime.Now;
-                        Console.Write("Enter Entry Date: ");
+                        Console.Write("Enter Entry Date [or press enter to use current date/time]: ");
                         string strEntryDate = Console.ReadLine();
                         if (strEntryDate != "")
                         {
@@ -536,7 +536,7 @@ namespace CovidApp
             while (!existingNameList.Contains(name) && name != "-1")
             {
                 Console.WriteLine("Error: {0} not found. Please try again.", name);
-                Console.Write("Enter person name: ");
+                Console.Write("Enter person name [or -1 to escape]: ");
                 name = Console.ReadLine();
             }
             if (name != "-1")
@@ -583,7 +583,7 @@ namespace CovidApp
                                 Console.WriteLine("SHN Facility Name: " + upte.ShnStay.FacilityName);
                             }
                             Console.WriteLine("Is Paid: " + upte.IsPaid);
-                            Console.WriteLine("SHN Charges: " + p.CalculateSHNCharges());
+                            Console.WriteLine("SHN Charges: $" + Math.Round(p.CalculateSHNCharges(),2));
 
                             Console.Write("\nWould you like to pay for this?(Y/N): ");
                             string choice = Console.ReadLine();
@@ -610,6 +610,49 @@ namespace CovidApp
             else
             {
                 Console.WriteLine("Cancelled Making Payment.");
+            }
+        }
+
+        static void ReportSHNStatus(List<Person> personList)
+        {
+            try
+            {
+                List<string> personServingSHNDetails = new List<string>();
+
+                Console.Write("Enter a Date/Time (DD/MM/YYYY hh:mm:ss): ");
+                DateTime checkTime = Convert.ToDateTime(Console.ReadLine());
+
+                foreach (Person p in personList)
+                {
+                    foreach (TravelEntry te in p.TravelEntryList)
+                    {
+                        if (checkTime > te.EntryDate && checkTime < te.ShnEndDate)
+                        {
+                            personServingSHNDetails.Add(p.Name + "," +te.ShnEndDate+","+te.ShnStay.FacilityName);
+                        }
+                    }
+                }
+
+                if (personServingSHNDetails.Count == 0)
+                {
+                    Console.WriteLine("No travellers serving SHN at {0} found.", checkTime);
+                }
+                else
+                {
+                    using (StreamWriter sw = new StreamWriter("SHN_Report.csv", false))
+                    {
+                        sw.WriteLine("Traveller's Name,SHN End Date/Time,SHN Facility Name");
+                        foreach (string s in personServingSHNDetails)
+                        {
+                            sw.WriteLine(s);
+                        }
+                    }
+                    Console.WriteLine("{0} travellers serving SHN at {1} found. CSV Report made.", personServingSHNDetails.Count, checkTime);
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Input string is not in the correct date format, input string should be in format of (DD/MM/YYYY hh:mm:ss). Please try again.");
             }
         }
 
