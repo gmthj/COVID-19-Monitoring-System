@@ -1110,7 +1110,7 @@ namespace CovidApp
                             if (se.Location.BusinessName == businessName && se.CheckIn >= startingCheckTime && se.CheckOut <= endingCheckTime)
                             {
                                 CheckedInList.Add(p);
-                                string data = Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
+                                string data = p.Name + "," + Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
                                 sw.WriteLine(data);
                                 exist = true;
                             }
