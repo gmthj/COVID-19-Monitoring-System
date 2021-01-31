@@ -117,7 +117,7 @@ namespace CovidApp
 
                 else if (selectedOption == 15) //SHN Status Reporting
                 {
-
+                    ReportSHNStatus(personList);
                 }
 
                 else if (selectedOption == 16) //Exit
@@ -610,6 +610,49 @@ namespace CovidApp
             else
             {
                 Console.WriteLine("Cancelled Making Payment.");
+            }
+        }
+
+        static void ReportSHNStatus(List<Person> personList)
+        {
+            try
+            {
+                List<string> personServingSHNDetails = new List<string>();
+
+                Console.Write("Enter a Date/Time (DD/MM/YYYY hh:mm:ss): ");
+                DateTime checkTime = Convert.ToDateTime(Console.ReadLine());
+
+                foreach (Person p in personList)
+                {
+                    foreach (TravelEntry te in p.TravelEntryList)
+                    {
+                        if (checkTime > te.EntryDate && checkTime < te.ShnEndDate)
+                        {
+                            personServingSHNDetails.Add(p.Name + "," +te.ShnEndDate+","+te.ShnStay.FacilityName);
+                        }
+                    }
+                }
+
+                if (personServingSHNDetails.Count == 0)
+                {
+                    Console.WriteLine("No travellers serving SHN at {0} found.", checkTime);
+                }
+                else
+                {
+                    using (StreamWriter sw = new StreamWriter("SHN_Report.csv", false))
+                    {
+                        sw.WriteLine("Traveller's Name,SHN End Date/Time,SHN Facility Name");
+                        foreach (string s in personServingSHNDetails)
+                        {
+                            sw.WriteLine(s);
+                        }
+                    }
+                    Console.WriteLine("{0} travellers serving SHN at {1} found. CSV Report made.", personServingSHNDetails.Count, checkTime);
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Input string is not in the correct date format, input string should be in format of (DD/MM/YYYY hh:mm:ss). Please try again.");
             }
         }
 
