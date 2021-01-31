@@ -66,7 +66,7 @@ namespace CovidApp
         {
             FacilityName = facilityName;
             FacilityCapacity = facilityCapacity;
-            FacilityVacancy = facilityCapacity; //*
+            FacilityVacancy = facilityCapacity;
             DistFromAirCheckpoint = distFromAirCheckpoint;
             DistFromLandCheckpoint = distFromLandCheckpoint;
             DistFromSeaCheckpoint = distFromSeaCheckpoint;

@@ -127,7 +127,6 @@ namespace CovidApp
                 Console.WriteLine();
             }
 
-
             //TESTING
             //foreach (string[] arr in personDataList)
             //{
@@ -165,8 +164,6 @@ namespace CovidApp
             //testResident.Token = testToken;
             //residentList.Add(testResident);
         }
-
-
         // Methods below were coded by:
         // Student Number : S10203190
         // Student Name : Tan Hiang Joon Gabriel
@@ -223,7 +220,7 @@ namespace CovidApp
                     return sf;
                 }
             }
-            Console.WriteLine("==\nERROR: facility name not found in SHN facility list\n=="); //error message for testing.
+            Console.WriteLine("Error: facility name not found in SHN facility list.");
             return null;
         }
 
@@ -420,7 +417,7 @@ namespace CovidApp
                     string lastCountryOfEmbarkation = Console.ReadLine();
                     Console.Write("Enter Entry Mode: ");
                     string entryMode = Console.ReadLine();
-                    while (entryMode != "Air" && entryMode != "Sea" && entryMode != "Land" && entryMode != "-1")
+                    while (entryMode != "Air" && entryMode != "Sea" && entryMode != "Land" && entryMode != "-1") //allows a -1 input as an escape code to exit loop
                     {
                         Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again. Use: \"Air\", \"Sea\" or \"Land\"", entryMode);
                         Console.Write("Enter Entry Mode [or -1 to escape]: ");
@@ -464,7 +461,7 @@ namespace CovidApp
                                     List<SHNFacility> avaSHNFacility = GetAvailableSHNFacilities(facilityList);
                                     if (avaSHNFacility.Count == 0)
                                     {
-                                        Console.WriteLine("All our SHN facilities are at maximum capacity. Please Contact PM Lee Hsien Loong for further assitance or go back to {0} i don't know", lastCountryOfEmbarkation);
+                                        Console.WriteLine("All our SHN facilities are at maximum capacity. Please Contact PM Lee Hsien Loong for further assitance or go back to {0} i don't know.", lastCountryOfEmbarkation);
                                     }
                                     else
                                     {
@@ -483,7 +480,7 @@ namespace CovidApp
                     }
                     else
                     {
-                        Console.WriteLine("Cancelled Creating Travel Entry Record.");
+                        Console.WriteLine("Cancelled Creating Travel Entry Record.");//display cancel message and returns to menu on input ot -1
                     }
                 }
             }
