@@ -444,7 +444,7 @@ namespace CovidApp
                                 personList[personIndex].TravelEntryList.Add(te);
                                 Console.WriteLine("Successfully added TravelEntry for {0}.", name);
                             }
-                            if ((te.ShnEndDate - te.EntryDate).Days == 7)
+                            else if ((te.ShnEndDate - te.EntryDate).Days == 7)
                             {
                                 personList[personIndex].TravelEntryList.Add(te);
                                 Console.WriteLine("Successfully added TravelEntry for {0} from {1} to {2}.", name, te.EntryDate, te.ShnEndDate);
