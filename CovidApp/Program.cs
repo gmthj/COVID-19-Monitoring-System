@@ -24,7 +24,10 @@ namespace CovidApp
             List<Visitor> visitorList = new List<Visitor>();
             List<BusinessLocation> businessList = new List<BusinessLocation>();
             List<SHNFacility> facilityList = new List<SHNFacility>();
-            
+            Resident testResident = new Resident("Marc", "123 East Road", new DateTime(2020, 12, 20));
+            TraceTogetherToken testToken = new TraceTogetherToken("T23451", "test", new DateTime(2021,1, 1));
+            testResident.Token = testToken;
+            residentList.Add(testResident);
             ObtainSHNFacilityData(facilityList);
             ObtainResidentsData(serialNoList, residentList, facilityList);
             ObtainVisitorData(visitorList, facilityList);
@@ -714,6 +717,11 @@ namespace CovidApp
                 {
                     Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
                 }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Input integer is too big of a number, input integer must be between 0 and 2,147,483,647. Please try again.");
+                }
+
             }
 
         }
@@ -933,7 +941,14 @@ namespace CovidApp
                 {
                     Console.Write("Please enter new maximum capacity of business location (any positive integer): ");
                     int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
-                    searchedLocation.MaximumCapacity = newMaxCapacity;
+                    if (newMaxCapacity >= 0)
+                    {
+                        searchedLocation.MaximumCapacity = newMaxCapacity;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error, invalid maximum capacity. Maximum capacity must be a positive integer. Please try again.");
+                    }
                 }
                 else
                 {
@@ -943,6 +958,10 @@ namespace CovidApp
             catch (FormatException)
             {
                 Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Input integer is too big of a number, input integer must be between 0 and 2,147,483,647. Please try again.");
             }
         }
 
@@ -999,41 +1018,60 @@ namespace CovidApp
             {
                 Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
             }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Input integer is too big of a number, input integer must be between 0 and 2,147,483,647. Please try again.");
+            }
         }
         static void SafeEntryCheckOut(List<Person> personList)
         {
             try
             {
-                int count = 1;
+                int checkedInCount = 0;
+                int displayCount = 1;
                 Console.Write("Please enter the name of the person that is checking out (Case Sensative): ");
                 string personName = Console.ReadLine();
                 Console.WriteLine();
                 Person searchedPerson = SearchPersonByName(personList, personName);
                 if (searchedPerson != null)
                 {
-                    foreach (SafeEntry se in searchedPerson.SafeEntryList)
+                    foreach(SafeEntry se in searchedPerson.SafeEntryList)
                     {
-                        if (se.CheckOut == DateTime.MinValue)
+                        if(se.CheckOut == DateTime.MinValue)
                         {
-                            Console.WriteLine("Safe Entry Record Number [{0}]", count);
-                            Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
-                            Console.WriteLine("Business Location: {0}", se.Location);
-                            Console.WriteLine();
-                            count += 1;
+                            checkedInCount += 1;
                         }
                     }
-                    Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
-                    int chosenRecord = Convert.ToInt32(Console.ReadLine());
-                    if (chosenRecord >0 && chosenRecord <= searchedPerson.SafeEntryList.Count)
+                    if (checkedInCount > 0)
                     {
-                        SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord - 1];
-                        chosenSafeEntry.PerformCheckOut();
-                        chosenSafeEntry.Location.VisitorsNow -= 1;
-                        Console.WriteLine("Person with name {0} has been checked out of {1}.", personName, chosenSafeEntry.Location.BusinessName);
+                        foreach (SafeEntry se in searchedPerson.SafeEntryList)
+                        {
+                            if (se.CheckOut == DateTime.MinValue)
+                            {
+                                Console.WriteLine("Safe Entry Record Number [{0}]", displayCount);
+                                Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
+                                Console.WriteLine("Business Location: {0}", se.Location);
+                                Console.WriteLine();
+                                displayCount += 1;
+                            }
+                        }
+                        Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
+                        int chosenRecord = Convert.ToInt32(Console.ReadLine());
+                        if (chosenRecord > 0 && chosenRecord <= searchedPerson.SafeEntryList.Count)
+                        {
+                            SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord - 1];
+                            chosenSafeEntry.PerformCheckOut();
+                            chosenSafeEntry.Location.VisitorsNow -= 1;
+                            Console.WriteLine("Person with name {0} has been checked out of {1}.", personName, chosenSafeEntry.Location.BusinessName);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error, invalid option. Option must be integer between 1 and {0}, please try again.", searchedPerson.SafeEntryList.Count);
+                        }
                     }
                     else
                     {
-                        Console.WriteLine("Error, invalid option. Option must be integer between 1 and {0}, please try again.", searchedPerson.SafeEntryList.Count);
+                        Console.WriteLine("Error, person with name {0} is not currently checked in at any business locations", personName);
                     }
                 }
                 else
@@ -1044,6 +1082,10 @@ namespace CovidApp
             catch (FormatException)
             {
                 Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Input integer is too big of a number, input integer must be between 0 and 2,147,483,647. Please try again.");
             }
         }
         static void ContactTracingReport(List<Person> personList)
@@ -1078,7 +1120,7 @@ namespace CovidApp
                             if (se.Location.BusinessName == businessName && se.CheckIn >= startingCheckTime && se.CheckOut <= endingCheckTime)
                             {
                                 CheckedInList.Add(p);
-                                string data = Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
+                                string data = p.Name + "," + Convert.ToString(se.CheckIn) + "," + Convert.ToString(se.CheckOut) + "," + se.Location.BusinessName;
                                 sw.WriteLine(data);
                                 exist = true;
                             }
