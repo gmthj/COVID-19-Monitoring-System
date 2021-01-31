@@ -24,7 +24,10 @@ namespace CovidApp
             List<Visitor> visitorList = new List<Visitor>();
             List<BusinessLocation> businessList = new List<BusinessLocation>();
             List<SHNFacility> facilityList = new List<SHNFacility>();
-            
+            Resident testResident = new Resident("Marc", "123 East Road", new DateTime(2020, 12, 20));
+            TraceTogetherToken testToken = new TraceTogetherToken("T23451", "test", new DateTime(2021,1, 1));
+            testResident.Token = testToken;
+            residentList.Add(testResident);
             ObtainSHNFacilityData(facilityList);
             ObtainResidentsData(serialNoList, residentList, facilityList);
             ObtainVisitorData(visitorList, facilityList);
