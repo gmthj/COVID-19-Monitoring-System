@@ -446,7 +446,7 @@ namespace CovidApp
                             else if ((te.ShnEndDate - te.EntryDate).Days == 7)
                             {
                                 personList[personIndex].TravelEntryList.Add(te);
-                                Console.WriteLine("Successfully added TravelEntry for {0} from {1} to {2}.", name, te.EntryDate, te.ShnEndDate);
+                                Console.WriteLine("Successfully added TravelEntry for {0} at own accommodation from {1} to {2}.", name, te.EntryDate, te.ShnEndDate);
                             }
                             else
                             {
@@ -627,7 +627,14 @@ namespace CovidApp
                     {
                         if (checkTime > te.EntryDate && checkTime < te.ShnEndDate)
                         {
-                            personServingSHNDetails.Add(p.Name + "," +te.ShnEndDate+","+te.ShnStay.FacilityName);
+                            if (te.ShnStay == null)
+                            {
+                                personServingSHNDetails.Add(p.Name + "," + te.ShnEndDate + ",own accommodation");
+                            }
+                            else
+                            {
+                                personServingSHNDetails.Add(p.Name + "," + te.ShnEndDate + "," + te.ShnStay.FacilityName);
+                            }
                         }
                     }
                 }
