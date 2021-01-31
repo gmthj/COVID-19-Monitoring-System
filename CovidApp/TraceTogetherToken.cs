@@ -55,7 +55,7 @@ namespace CovidApp
             //    eligibility = true;
             //}
             //return eligibility;
-            DateTime eligibilityDate = expiryDate.AddMonths(-1);
+            DateTime eligibilityDate = expiryDate.AddMonths(-1); //sets eligibility date to 1 month before expiry date, this method is used instead of previous method (now commented) since it does not care how many days are in a month
             if (DateTime.Today >= eligibilityDate) 
             {
                 eligibility = true;
