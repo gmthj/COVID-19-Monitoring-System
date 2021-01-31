@@ -140,7 +140,7 @@ namespace CovidApp
             //        Console.Write(data + "\t");
             //    }
             //    Console.WriteLine("");
-            //}
+            //}.
 
             //CalculateSHNCharges() testing;
             //DateTime time = new DateTime(2021, 1, 29, 20, 40, 30);
