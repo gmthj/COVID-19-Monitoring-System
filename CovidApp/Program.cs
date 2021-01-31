@@ -409,74 +409,86 @@ namespace CovidApp
                 Person p = SearchPersonByName(personList, name);
                 int personIndex = personList.IndexOf(SearchPersonByName(personList, name));
 
-                Console.Write("Enter Last Country Of Embarkation: ");
-                string lastCountryOfEmbarkation = Console.ReadLine();
-                Console.Write("Enter Entry Mode: ");
-                string entryMode = Console.ReadLine();
-                while (entryMode != "Air" && entryMode != "Sea" && entryMode != "Land" && entryMode != "-1")
+                bool paid = true;
+                foreach (TravelEntry te in p.TravelEntryList)
                 {
-                    Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again. Use: \"Air\", \"Sea\" or \"Land\"", entryMode);
-                    Console.Write("Enter Entry Mode [or -1 to escape]: ");
-                    entryMode = Console.ReadLine();
-                }
-                if (entryMode != "-1")
-                {
-                    try
+                    if (!te.IsPaid)
                     {
-                        DateTime entryDate = DateTime.Now;
-                        Console.Write("Enter Entry Date [or press enter to use current date/time]: ");
-                        string strEntryDate = Console.ReadLine();
-                        if (strEntryDate != "")
+                        Console.WriteLine("Unable to create new Travel Entry record. Previous Travel Entry has not been paid.");
+                        paid = false;
+                    }
+                }
+                if (paid)
+                {
+                    Console.Write("Enter Last Country Of Embarkation: ");
+                    string lastCountryOfEmbarkation = Console.ReadLine();
+                    Console.Write("Enter Entry Mode: ");
+                    string entryMode = Console.ReadLine();
+                    while (entryMode != "Air" && entryMode != "Sea" && entryMode != "Land" && entryMode != "-1")
+                    {
+                        Console.WriteLine("Error: Invalid Entry Mode:{0}. Please try again. Use: \"Air\", \"Sea\" or \"Land\"", entryMode);
+                        Console.Write("Enter Entry Mode [or -1 to escape]: ");
+                        entryMode = Console.ReadLine();
+                    }
+                    if (entryMode != "-1")
+                    {
+                        try
                         {
-                            entryDate = Convert.ToDateTime(strEntryDate);
-                        }
-                        if (entryDate > DateTime.Now)
-                        {
-                            Console.WriteLine("Invalid date. Date must not be later than current date. Please try again.");
-                        }
-                        else if (p.TravelEntryList.Count != 0 && entryDate >= p.TravelEntryList[p.TravelEntryList.Count - 1].EntryDate && entryDate <= p.TravelEntryList[p.TravelEntryList.Count - 1].ShnEndDate)
-                        {
-                            Console.WriteLine("{0} is still serving another SHN on {1}.", name, entryDate);
-                        }
-                        else
-                        {
-                            TravelEntry te = new TravelEntry(lastCountryOfEmbarkation, entryMode, entryDate);
-                            //CalculateSHNDuration() called in TravelEntry class constructor
-                            if (te.ShnEndDate == te.EntryDate)
+                            DateTime entryDate = DateTime.Now;
+                            Console.Write("Enter Entry Date [or press enter to use current date/time]: ");
+                            string strEntryDate = Console.ReadLine();
+                            if (strEntryDate != "")
                             {
-                                personList[personIndex].TravelEntryList.Add(te);
-                                Console.WriteLine("Successfully added TravelEntry for {0}.", name);
+                                entryDate = Convert.ToDateTime(strEntryDate);
                             }
-                            else if ((te.ShnEndDate - te.EntryDate).Days == 7)
+                            if (entryDate > DateTime.Now)
                             {
-                                personList[personIndex].TravelEntryList.Add(te);
-                                Console.WriteLine("Successfully added TravelEntry for {0} at own accommodation from {1} to {2}.", name, te.EntryDate, te.ShnEndDate);
+                                Console.WriteLine("Invalid date. Date must not be later than current date. Please try again.");
+                            }
+                            else if (p.TravelEntryList.Count != 0 && entryDate >= p.TravelEntryList[p.TravelEntryList.Count - 1].EntryDate && entryDate <= p.TravelEntryList[p.TravelEntryList.Count - 1].ShnEndDate)
+                            {
+                                Console.WriteLine("{0} is still serving another SHN on {1}.", name, entryDate);
                             }
                             else
                             {
-                                List<SHNFacility> avaSHNFacility = GetAvailableSHNFacilities(facilityList);
-                                if (avaSHNFacility.Count == 0)
+                                TravelEntry te = new TravelEntry(lastCountryOfEmbarkation, entryMode, entryDate);
+                                //CalculateSHNDuration() called in TravelEntry class constructor
+                                if (te.ShnEndDate == te.EntryDate)
                                 {
-                                    Console.WriteLine("All our SHN facilities are at maximum capacity. Please Contact PM Lee Hsien Loong for further assitance or go back to {0} i don't know", lastCountryOfEmbarkation);
+                                    personList[personIndex].TravelEntryList.Add(te);
+                                    Console.WriteLine("Successfully added TravelEntry for {0}.", name);
+                                }
+                                else if ((te.ShnEndDate - te.EntryDate).Days == 7)
+                                {
+                                    personList[personIndex].TravelEntryList.Add(te);
+                                    Console.WriteLine("Successfully added TravelEntry for {0} at own accommodation from {1} to {2}.", name, te.EntryDate, te.ShnEndDate);
                                 }
                                 else
                                 {
-                                    te.AssignSHNFacility(SelectSHNFacility(avaSHNFacility));
-                                    te.ShnStay.FacilityVacancy--;
-                                    personList[personIndex].TravelEntryList.Add(te);
-                                    Console.WriteLine("Successfully added TravelEntry for {0} at {1} from {2} to {3}.", name, te.ShnStay.FacilityName, te.EntryDate, te.ShnEndDate);
+                                    List<SHNFacility> avaSHNFacility = GetAvailableSHNFacilities(facilityList);
+                                    if (avaSHNFacility.Count == 0)
+                                    {
+                                        Console.WriteLine("All our SHN facilities are at maximum capacity. Please Contact PM Lee Hsien Loong for further assitance or go back to {0} i don't know", lastCountryOfEmbarkation);
+                                    }
+                                    else
+                                    {
+                                        te.AssignSHNFacility(SelectSHNFacility(avaSHNFacility));
+                                        te.ShnStay.FacilityVacancy--;
+                                        personList[personIndex].TravelEntryList.Add(te);
+                                        Console.WriteLine("Successfully added TravelEntry for {0} at {1} from {2} to {3}.", name, te.ShnStay.FacilityName, te.EntryDate, te.ShnEndDate);
+                                    }
                                 }
                             }
                         }
+                        catch (FormatException)
+                        {
+                            Console.WriteLine("Invalid date format. Please try again.");
+                        }
                     }
-                    catch (FormatException)
+                    else
                     {
-                        Console.WriteLine("Invalid date format. Please try again.");
+                        Console.WriteLine("Cancelled Creating Travel Entry Record.");
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Cancelled Creating Travel Entry Record.");
                 }
             }
             else
@@ -544,6 +556,7 @@ namespace CovidApp
             }
             if (name != "-1")
             {
+
                 Person p = SearchPersonByName(personList, name);
                 //int personIndex = personList.IndexOf(SearchPersonByName(personList, name));
 
@@ -572,7 +585,7 @@ namespace CovidApp
                         int travelEntryCount = 1;
                         foreach (TravelEntry upte in unpaidTE)
                         {
-                            Console.WriteLine("\nTravel Entry Record Number [" + travelEntryCount + "]");
+                            Console.WriteLine("\nTravel Entry Record");
                             Console.WriteLine("Last Country Of Embarkation: " + upte.LastCountryOfEmbarkation);
                             Console.WriteLine("Entry Mode: " + upte.EntryMode);
                             Console.WriteLine("Entry Date: " + upte.EntryDate);
