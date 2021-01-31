@@ -1017,36 +1017,51 @@ namespace CovidApp
         {
             try
             {
-                int count = 1;
+                int checkedInCount = 0;
+                int displayCount = 1;
                 Console.Write("Please enter the name of the person that is checking out (Case Sensative): ");
                 string personName = Console.ReadLine();
                 Console.WriteLine();
                 Person searchedPerson = SearchPersonByName(personList, personName);
                 if (searchedPerson != null)
                 {
-                    foreach (SafeEntry se in searchedPerson.SafeEntryList)
+                    foreach(SafeEntry se in searchedPerson.SafeEntryList)
                     {
-                        if (se.CheckOut == DateTime.MinValue)
+                        if(se.CheckOut == DateTime.MinValue)
                         {
-                            Console.WriteLine("Safe Entry Record Number [{0}]", count);
-                            Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
-                            Console.WriteLine("Business Location: {0}", se.Location);
-                            Console.WriteLine();
-                            count += 1;
+                            checkedInCount += 1;
                         }
                     }
-                    Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
-                    int chosenRecord = Convert.ToInt32(Console.ReadLine());
-                    if (chosenRecord >0 && chosenRecord <= searchedPerson.SafeEntryList.Count)
+                    if (checkedInCount > 0)
                     {
-                        SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord - 1];
-                        chosenSafeEntry.PerformCheckOut();
-                        chosenSafeEntry.Location.VisitorsNow -= 1;
-                        Console.WriteLine("Person with name {0} has been checked out of {1}.", personName, chosenSafeEntry.Location.BusinessName);
+                        foreach (SafeEntry se in searchedPerson.SafeEntryList)
+                        {
+                            if (se.CheckOut == DateTime.MinValue)
+                            {
+                                Console.WriteLine("Safe Entry Record Number [{0}]", displayCount);
+                                Console.WriteLine("Check In Date And Time: {0}", se.CheckIn);
+                                Console.WriteLine("Business Location: {0}", se.Location);
+                                Console.WriteLine();
+                                displayCount += 1;
+                            }
+                        }
+                        Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
+                        int chosenRecord = Convert.ToInt32(Console.ReadLine());
+                        if (chosenRecord > 0 && chosenRecord <= searchedPerson.SafeEntryList.Count)
+                        {
+                            SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord - 1];
+                            chosenSafeEntry.PerformCheckOut();
+                            chosenSafeEntry.Location.VisitorsNow -= 1;
+                            Console.WriteLine("Person with name {0} has been checked out of {1}.", personName, chosenSafeEntry.Location.BusinessName);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error, invalid option. Option must be integer between 1 and {0}, please try again.", searchedPerson.SafeEntryList.Count);
+                        }
                     }
                     else
                     {
-                        Console.WriteLine("Error, invalid option. Option must be integer between 1 and {0}, please try again.", searchedPerson.SafeEntryList.Count);
+                        Console.WriteLine("Error, person with name {0} is not currently checked in at any business locations", personName);
                     }
                 }
                 else
