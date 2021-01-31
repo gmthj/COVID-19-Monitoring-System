@@ -734,13 +734,13 @@ namespace CovidApp
                         if (formattedLine[0] == "resident")
                         {
                             Resident newResident = new Resident(formattedLine[1], formattedLine[2], Convert.ToDateTime(formattedLine[3]));
-                            if (formattedLine[6] != "")
+                            if (formattedLine[6] != "") //Checks if they are a resident by checking if they have a TraceTogether Token
                             {
                                 TraceTogetherToken newToken = new TraceTogetherToken(formattedLine[6], formattedLine[7], Convert.ToDateTime(formattedLine[8]));
                                 newResident.Token = newToken;
-                                serialNoList.Add(newToken.SerialNo);
+                                serialNoList.Add(newToken.SerialNo); //Adds new serial number to serialNoList so that future tokens cant have the same serial number
                             }
-                            if (formattedLine[9] != "")
+                            if (formattedLine[9] != "") //Checks if they are a visitor by checking if they came from another country
                             {
                                 newResident.AddTravelEntry(NewTravelEntry(formattedLine[9], formattedLine[10], Convert.ToDateTime(formattedLine[11]), Convert.ToDateTime(formattedLine[12]), Convert.ToBoolean(formattedLine[13]), formattedLine[14], facilityList));
                             }
@@ -798,9 +798,9 @@ namespace CovidApp
                 Random rnd = new Random();
                 int min = 0;
                 int max = 99999;
-                int randomNumber = rnd.Next(min,max);
-                serialNo = "T" + randomNumber.ToString("D5");
-                if (serialNoList.Contains(serialNo))
+                int randomNumber = rnd.Next(min,max); //generates random number from range (min,max)         
+                serialNo = "T" + randomNumber.ToString("D5"); //used to add padded zeros to left of numbers which are less than 5 digits ie 1 becomes 00001
+                if (serialNoList.Contains(serialNo)) //Selection statement checks if the randomly generated serial number is already in use
                 {
                     continue;
                 }
@@ -821,7 +821,7 @@ namespace CovidApp
         {
             string address = r.Address;
             string[] formattedAddress = address.Split(" ");
-            string collectionLocation = formattedAddress[1] + " " + formattedAddress[2] + " CC";
+            string collectionLocation = formattedAddress[1] + " " + formattedAddress[2] + " CC"; //collection location is last 2 words of residents address + "CC"
             return collectionLocation;
         }
 
@@ -836,7 +836,7 @@ namespace CovidApp
                 {
                     string collectionLocation = ObtainCollectionLocation(searchedResident);
                     string serialNo = GenerateNewSerialNo(serialNoList);
-                    DateTime expiryDate = DateTime.Today.AddMonths(6);
+                    DateTime expiryDate = DateTime.Today.AddMonths(6); //expiry date of new token is always 6 months from issue
                     TraceTogetherToken newToken = new TraceTogetherToken(serialNo, collectionLocation, expiryDate);
                     searchedResident.Token = newToken;
                     Console.WriteLine();
@@ -1031,7 +1031,7 @@ namespace CovidApp
                 Person searchedPerson = SearchPersonByName(personList, personName);
                 if (searchedPerson != null)
                 {
-                    foreach(SafeEntry se in searchedPerson.SafeEntryList)
+                    foreach(SafeEntry se in searchedPerson.SafeEntryList) //counts the number of safe entries that have not been checked out of
                     {
                         if(se.CheckOut == DateTime.MinValue)
                         {
@@ -1040,7 +1040,7 @@ namespace CovidApp
                     }
                     if (checkedInCount > 0)
                     {
-                        foreach (SafeEntry se in searchedPerson.SafeEntryList)
+                        foreach (SafeEntry se in searchedPerson.SafeEntryList) //displays all safe entries that have not been checked out of
                         {
                             if (se.CheckOut == DateTime.MinValue)
                             {
@@ -1053,7 +1053,7 @@ namespace CovidApp
                         }
                         Console.Write("Please enter the SafeEntry Record Number (1, 2, 3, etc.) of the SafeEntry Record to check out of: ");
                         int chosenRecord = Convert.ToInt32(Console.ReadLine());
-                        if (chosenRecord > 0 && chosenRecord <= searchedPerson.SafeEntryList.Count)
+                        if (chosenRecord > 0 && chosenRecord <= searchedPerson.SafeEntryList.Count) 
                         {
                             SafeEntry chosenSafeEntry = searchedPerson.SafeEntryList[chosenRecord - 1];
                             chosenSafeEntry.PerformCheckOut();
