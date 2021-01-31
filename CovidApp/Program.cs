@@ -707,6 +707,11 @@ namespace CovidApp
                 {
                     Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
                 }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Input integer is too big of a number, input integer must be between 0 and 2,147,483,647. Please try again.");
+                }
+
             }
 
         }
@@ -926,7 +931,14 @@ namespace CovidApp
                 {
                     Console.Write("Please enter new maximum capacity of business location (any positive integer): ");
                     int newMaxCapacity = Convert.ToInt32(Console.ReadLine());
-                    searchedLocation.MaximumCapacity = newMaxCapacity;
+                    if (newMaxCapacity >= 0)
+                    {
+                        searchedLocation.MaximumCapacity = newMaxCapacity;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error, invalid maximum capacity. Maximum capacity must be a positive integer. Please try again.");
+                    }
                 }
                 else
                 {
@@ -936,6 +948,10 @@ namespace CovidApp
             catch (FormatException)
             {
                 Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Input integer is too big of a number, input integer must be between 0 and 2,147,483,647. Please try again.");
             }
         }
 
@@ -992,6 +1008,10 @@ namespace CovidApp
             {
                 Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
             }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Input integer is too big of a number, input integer must be between 0 and 2,147,483,647. Please try again.");
+            }
         }
         static void SafeEntryCheckOut(List<Person> personList)
         {
@@ -1037,6 +1057,10 @@ namespace CovidApp
             catch (FormatException)
             {
                 Console.WriteLine("Input string is not in the correct format, input string should be an integer. Please try again.");
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Input integer is too big of a number, input integer must be between 0 and 2,147,483,647. Please try again.");
             }
         }
         static void ContactTracingReport(List<Person> personList)
