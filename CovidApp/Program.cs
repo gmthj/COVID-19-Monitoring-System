@@ -648,7 +648,7 @@ namespace CovidApp
             {
                 try
                 {
-                    Console.Write("Please enter your option: ");
+                    Console.Write("Please enter your option (between 1 and 16): ");
                     int option = Convert.ToInt32(Console.ReadLine());
                     if (option > 16 || option < 1)
                     {
